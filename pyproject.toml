@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0.0"]
+requires = ["setuptools>=82.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "admet_ai"
 dynamic = ["version"]
 description = "ADMET-AI"
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.15"
 license = "MIT"
 license-files = [ "LICENSE.txt" ]
 authors = [
@@ -27,6 +27,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
