@@ -15,9 +15,7 @@ from tdc_constants import (
 )
 
 
-def train_tdc_admet_all(
-    data_dir: Path, save_dir: Path, model_type: Literal["chemprop", "chemprop_rdkit"]
-) -> None:
+def train_tdc_admet_all(data_dir: Path, save_dir: Path, model_type: Literal["chemprop", "chemprop_rdkit"]) -> None:
     """Train Chemprop models on the Therapeutics Data Commons (TDC) ADMET Benchmark Group datasets.
 
     :param data_dir: A directory containing the downloaded and prepared TDC ADMET Benchmark Group data.
@@ -51,8 +49,6 @@ def train_tdc_admet_all(
                 save_dir / model_type / data_name / str(seed),
                 "--checkpoint",
                 save_dir / model_type / data_name / str(seed),
-                # "--save_preds",
-                # "--quiet",
             ]
 
             if model_type == "chemprop_rdkit":

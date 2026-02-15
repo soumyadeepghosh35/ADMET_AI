@@ -92,8 +92,8 @@ DATASET_TO_TYPE_LOWER = {
     dataset.lower(): dataset_type for dataset, dataset_type in DATASET_TO_TYPE.items()
 }
 DATASET_TYPE_TO_METRICS_COMMAND_LINE = {
-    "classification": ["--metric", "binary-mcc"],
-    "regression": ["--metric", "mae"],
+    "classification": ["--metrics", "roc", "prc"],
+    "regression": ["--metrics", "mae", "r2"],
 }
 DATASET_TO_LABEL_NAMES = {
     "herg_central": ["hERG_inhib"],
