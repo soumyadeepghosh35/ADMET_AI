@@ -37,7 +37,11 @@ def load_drugbank(drugbank_path: Path = DEFAULT_DRUGBANK_PATH) -> None:
 
 
 def read_drugbank_data(drugbank_path: Path) -> pd.DataFrame:
-    """Load the drugbank data and returns a dataframe"""
+    """Load the drugbank data and returns a dataframe.
+
+    :param drugbank_path: The path to the DrugBank data.
+    :return: A DataFrame containing the DrugBank data.
+    """
     if not drugbank_path.exists():
         raise FileNotFoundError(f"The path to the drugbank archive is not correct: {drugbank_path}")
 
@@ -46,7 +50,11 @@ def read_drugbank_data(drugbank_path: Path) -> pd.DataFrame:
 
 
 def create_atc_code_mapping(drugbank: pd.DataFrame) -> dict:
-    """Map ATC codes to drugbank indices."""
+    """Map ATC codes to drugbank indices.
+
+    :param drugbank: A DataFrame containing the DrugBank data.
+    :return: A dictionary mapping ATC codes to drugbank indices.
+    """
     atc_code_to_drugbank_indices = defaultdict(set)
 
     # Map ATC codes to all indices of the drugbank with that ATC code
@@ -59,8 +67,13 @@ def create_atc_code_mapping(drugbank: pd.DataFrame) -> dict:
     return {atc_code: sorted(indices) for atc_code, indices in atc_code_to_drugbank_indices.items()}
 
 
-def filter_drugbank_by_atc(atc_code: str, drugbank: pd.DataFrame) -> pd.DataFrame:
-    """Filter DrugBank data by ATC code."""
+def filter_drugbank_by_atc(atc_code: str | None, drugbank: pd.DataFrame) -> pd.DataFrame:
+    """Filter DrugBank data by ATC code.
+
+    :param atc_code: The ATC code to filter by. If None, returns the entire DrugBank.
+    :param drugbank: A DataFrame containing the DrugBank data.
+    :return: A DataFrame containing the DrugBank data filtered by ATC code.
+    """
     if not atc_code:
         return drugbank
 

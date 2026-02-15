@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-from lightning import pytorch as pl
 from chemprop.data import (
     MoleculeDatapoint,
     MoleculeDataset,
@@ -14,6 +13,8 @@ from chemprop.models import load_model
 from chemprop.data.dataloader import build_dataloader
 from chemprop.models import MPNN
 from chemprop.models.utils import load_output_columns
+from lightning import pytorch as pl
+from torch.utils.data import DataLoader
 
 from rdkit import Chem
 from scipy.stats import percentileofscore
@@ -78,7 +79,10 @@ class ADMETModel:
         self._atc_code = atc_code
 
         # Load DrugBank reference set if needed
-        self.drugbank, self.drugbank_atc_filtered = self._load_drugbank_data(drugbank_path, atc_code)
+        self.drugbank, self.drugbank_atc_filtered = self._load_drugbank_data(
+            drugbank_path=drugbank_path,
+            atc_code=atc_code,
+        )
 
         # Set device based on GPU availability
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -94,20 +98,30 @@ class ADMETModel:
         # TODO: This is currently assuming we should always use our own fingerprints
         self.use_features = True
 
-    def _load_drugbank_data(self, drugbank_path, atc_code):
-        """Load the drugbank data and map ATC codes to each drugbank index"""
+    def _load_drugbank_data(
+        self, drugbank_path: Path | str | None, atc_code: str | None
+    ) -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
+        """Load the drugbank data and map ATC codes to each drugbank index.
+
+        :param drugbank_path: Path to the DrugBank data.
+        :param atc_code: The ATC code to filter the DrugBank data by.
+        :return: A tuple containing the DrugBank data and the filtered DrugBank data.
+        """
         if not drugbank_path:
             drugbank = drugbank_atc_filtered = None
             return drugbank, drugbank_atc_filtered
 
-        drugbank = read_drugbank_data(drugbank_path)
+        drugbank = read_drugbank_data(drugbank_path=drugbank_path)
 
-        drugbank_atc_filtered = filter_drugbank_by_atc(atc_code, drugbank)
+        drugbank_atc_filtered = filter_drugbank_by_atc(atc_code=atc_code, drugbank=drugbank)
 
         return drugbank, drugbank_atc_filtered
 
-    def _load_model_ensembles(self, models_dir):
-        """Load model ensembles from the specified directory."""
+    def _load_model_ensembles(self, models_dir: Path | str) -> None:
+        """Load model ensembles from the specified directory.
+
+        :param models_dir: Path to the directory containing directories of model ensembles.
+        """
         self.task_lists = []
         self.model_lists = []
         model_dirs = sorted(Path(models_dir).iterdir())
@@ -148,7 +162,7 @@ class ADMETModel:
         # Save ATC code
         self._atc_code = atc_code
 
-        self.drugbank_atc_filtered = self._filter_drugbank_by_atc(atc_code)
+        self.drugbank_atc_filtered = self._filter_drugbank_by_atc(atc_code=atc_code)
 
     def predict(self, smiles: str | list[str]) -> dict[str, float] | pd.DataFrame:
         """Make predictions on a list of SMILES strings.
@@ -161,16 +175,18 @@ class ADMETModel:
         # Convert SMILES to list if needed
         smiles, smiles_type = self._prepare_smiles(smiles=smiles)
 
-        mols, smiles = self._filter_valid_molecules(smiles)
+        mols, smiles = self._filter_valid_molecules(smiles=smiles)
 
         # Compute physicochemical properties
         physchem_preds = compute_physicochemical_properties(all_smiles=smiles, mols=mols)
 
-        fingerprints = compute_fingerprints(mols, self.use_features, self.fingerprint_multiprocessing_min)
+        fingerprints = compute_fingerprints(
+            mols=mols, use_features=self.use_features, min_parallel=self.fingerprint_multiprocessing_min
+        )
 
-        data_loader = self._build_dataloader(mols, fingerprints)
+        data_loader = self._build_dataloader(mols=mols, fingerprints=fingerprints)
 
-        task_to_preds = self._make_ensemble_predictions(data_loader)
+        task_to_preds = self._make_ensemble_predictions(data_loader=data_loader)
 
         # Put preds in a DataFrame
         admet_preds = pd.DataFrame(task_to_preds, index=smiles)
@@ -179,21 +195,29 @@ class ADMETModel:
         assert physchem_preds.index.equals(admet_preds.index), "Internal Error: Indices do not match."
         preds = pd.concat((physchem_preds, admet_preds), axis=1)
 
-        final_predictions = self._add_drugbank_percentiles(preds, smiles)
+        final_predictions = self._add_drugbank_percentiles(preds=preds, smiles=smiles)
         # Convert to dictionary if SMILES type is string
         if smiles_type == str:
             final_predictions = final_predictions.iloc[0].to_dict()
 
         return final_predictions
 
-    def _prepare_smiles(self, smiles: list[str]):
-        """Ensure SMILES is a list and identify its type."""
+    def _prepare_smiles(self, smiles: list[str] | str) -> tuple[list[str], type]:
+        """Ensure SMILES is a list and identify its type.
+
+        :param smiles: A SMILES string or a list of SMILES strings.
+        :return: A tuple containing a list of SMILES strings and the type of the SMILES string.
+        """
         if isinstance(smiles, str):
             return [smiles], str
         return smiles, list
 
-    def _filter_valid_molecules(self, smiles: list[str]):
-        """Convert SMILES to RDKit molecules and filter out invalid ones."""
+    def _filter_valid_molecules(self, smiles: list[str]) -> tuple[list[Chem.Mol], list[str]]:
+        """Convert SMILES to RDKit molecules and filter out invalid ones.
+
+        :param smiles: A list of SMILES strings.
+        :return: A tuple containing a list of RDKit molecules and a list of SMILES strings.
+        """
         valid_mols_smiles = [(Chem.MolFromSmiles(smile), smile) for smile in tqdm(smiles, desc="SMILES to Mol")]
         valid_mols_smiles = [(mol, smile) for mol, smile in valid_mols_smiles if mol]
 
@@ -201,17 +225,26 @@ class ADMETModel:
             print(f"Warning: {len(smiles) - len(valid_mols_smiles):,} invalid molecules removed.")
 
         mols, filtered_smiles = zip(*valid_mols_smiles) if valid_mols_smiles else ([], [])
+
         return mols, filtered_smiles
 
-    def _build_dataloader(self, mols, fingerprints):
-        """Create a DataLoader for model predictions."""
+    def _build_dataloader(self, mols: list[Chem.Mol], fingerprints: np.ndarray) -> DataLoader:
+        """Create a DataLoader for model predictions.
+
+        :param mols: A list of RDKit molecules.
+        :param fingerprints: A numpy array of fingerprints.
+        :return: A DataLoader.
+        """
         data_points = [MoleculeDatapoint(mol=mol, x_d=fingerprint) for mol, fingerprint in zip(mols, fingerprints)]
         dataset = MoleculeDataset(data=data_points)
         return build_dataloader(dataset=dataset, num_workers=self.num_workers, shuffle=False)
 
-    def _make_ensemble_predictions(self, data_loader):
-        """Run predictions across model ensembles."""
+    def _make_ensemble_predictions(self, data_loader: DataLoader) -> dict[str, np.ndarray]:
+        """Run predictions across model ensembles.
 
+        :param data_loader: A DataLoader.
+        :return: A dictionary mapping task names to numpy arrays of predictions.
+        """
         assert len(self.task_lists) == len(
             self.model_lists
         ), "Internal error: amount of retrieved models does not match the amount of tasks"
@@ -242,12 +275,17 @@ class ADMETModel:
 
         return task_to_preds
 
-    def _add_drugbank_percentiles(self, preds: pd.DataFrame, smiles: list[str]):
-        """Compute and add DrugBank percentiles if DrugBank data is available."""
+    def _add_drugbank_percentiles(self, preds: pd.DataFrame, smiles: list[str]) -> pd.DataFrame:
+        """Compute and add DrugBank percentiles if DrugBank data is available.
+
+        :param preds: A DataFrame of predictions.
+        :param smiles: A list of SMILES strings.
+        :return: A DataFrame of predictions with DrugBank percentiles added.
+        """
         if self.drugbank is None:
             return preds
 
-        drugbank_suffix = get_drugbank_suffix(self.atc_code)
+        drugbank_suffix = get_drugbank_suffix(atc_code=self.atc_code)
 
         drugbank_percentiles = {
             f"{property_name}_{drugbank_suffix}": [
