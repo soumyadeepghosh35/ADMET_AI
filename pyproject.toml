@@ -34,7 +34,7 @@ classifiers = [
 ]
 dependencies = [
     "chemfunc>=1.0.4",
-    "chemprop==1.6.1",
+    "chemprop==2.1.0",
     "numpy",
     "pandas>=2.0.0,<2.2.0",
     "rdkit>=2023.3.3",
