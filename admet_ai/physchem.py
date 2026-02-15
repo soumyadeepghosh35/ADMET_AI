@@ -84,15 +84,15 @@ def compute_fingerprints(mols: list[Chem.Mol], use_features: bool, min_parallel:
         return np.array([None] * len(mols))
 
     compute_func = Pool().imap if len(mols) >= min_parallel else map
-    with Pool() as pool:
-        fingerprints = np.array(
-            list(
-                tqdm(
-                    compute_func(compute_rdkit_fingerprint, mols),
-                    total=len(mols),
-                    desc="RDKit fingerprints",
-                )
+
+    fingerprints = np.array(
+        list(
+            tqdm(
+                compute_func(compute_rdkit_fingerprint, mols),
+                total=len(mols),
+                desc="RDKit fingerprints",
             )
         )
+    )
 
     return fingerprints

@@ -6,7 +6,7 @@ from importlib import resources
 with resources.path("admet_ai", "resources") as resources_dir:
     DEFAULT_ADMET_PATH = resources_dir / "data" / "admet.csv"
     DEFAULT_DRUGBANK_PATH = resources_dir / "data" / "drugbank_approved.csv"
-    DEFAULT_MODELS_DIR = resources_dir / "new_models"
+    DEFAULT_MODELS_DIR = resources_dir / "models"
 
 # DrugBank columns
 DRUGBANK_ID_COLUMN = "id"
