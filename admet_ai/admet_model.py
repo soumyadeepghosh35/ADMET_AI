@@ -162,7 +162,7 @@ class ADMETModel:
         # Save ATC code
         self._atc_code = atc_code
 
-        self.drugbank_atc_filtered = self._filter_drugbank_by_atc(atc_code=atc_code)
+        self.drugbank_atc_filtered = filter_drugbank_by_atc(atc_code=atc_code, drugbank=self.drugbank)
 
     def predict(self, smiles: str | list[str]) -> dict[str, float] | pd.DataFrame:
         """Make predictions on a list of SMILES strings.
