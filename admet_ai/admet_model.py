@@ -99,7 +99,7 @@ class ADMETModel:
         self.use_features = True
 
     def _load_drugbank_data(
-        self, drugbank_path: Path | str | None, atc_code: str | None
+        self, drugbank_path: Path | None, atc_code: str | None
     ) -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
         """Load the drugbank data and map ATC codes to each drugbank index.
 
@@ -107,7 +107,7 @@ class ADMETModel:
         :param atc_code: The ATC code to filter the DrugBank data by.
         :return: A tuple containing the DrugBank data and the filtered DrugBank data.
         """
-        if not drugbank_path:
+        if drugbank_path is None:
             drugbank = drugbank_atc_filtered = None
             return drugbank, drugbank_atc_filtered
 

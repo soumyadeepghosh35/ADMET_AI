@@ -76,10 +76,14 @@ def compute_physicochemical_properties(all_smiles: list[str], mols: list[Chem.Mo
     return physchem_properties
 
 
-def compute_fingerprints(mols: list[Chem.Mol], use_features: bool, min_parallel: int = 100) -> np.array:
+def compute_fingerprints(mols: list[Chem.Mol], use_features: bool, min_parallel: int = 100) -> np.ndarray:
     """Compute RDKit fingerprints if required using multiprocessing.
 
-    If not using rdkit features, returns a list of None"""
+    :param mols: A list of RDKit molecules.
+    :param use_features: Whether to use RDKit features.
+    :param min_parallel: The minimum number of molecules for multiprocessing to be used.
+    :return: A numpy array of fingerprints or a list of None if not using RDKit features.
+    """
     if not use_features:
         return np.array([None] * len(mols))
 

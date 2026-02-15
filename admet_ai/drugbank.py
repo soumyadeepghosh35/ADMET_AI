@@ -46,6 +46,7 @@ def read_drugbank_data(drugbank_path: Path) -> pd.DataFrame:
         raise FileNotFoundError(f"The path to the drugbank archive is not correct: {drugbank_path}")
 
     drugbank = pd.read_csv(drugbank_path)
+
     return drugbank
 
 
@@ -74,13 +75,14 @@ def filter_drugbank_by_atc(atc_code: str | None, drugbank: pd.DataFrame) -> pd.D
     :param drugbank: A DataFrame containing the DrugBank data.
     :return: A DataFrame containing the DrugBank data filtered by ATC code.
     """
-    if not atc_code:
+    if atc_code is None:
         return drugbank
 
-    atc_code_to_drugbank_indices = create_atc_code_mapping(drugbank)
+    atc_code_to_drugbank_indices = create_atc_code_mapping(drugbank=drugbank)
 
     if atc_code not in atc_code_to_drugbank_indices:
         raise ValueError(f"Invalid ATC code: {atc_code}")
+
     return drugbank.loc[atc_code_to_drugbank_indices[atc_code]]
 
 
