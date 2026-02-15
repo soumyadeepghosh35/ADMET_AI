@@ -7,7 +7,7 @@ name = "admet_ai"
 dynamic = ["version"]
 description = "ADMET-AI"
 readme = "README.md"
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.10"
 license = "MIT"
 license-files = [ "LICENSE.txt" ]
 authors = [
@@ -33,19 +33,20 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "chemfunc>=1.0.4",
-    "chemprop==2.1.0",
+    "chemfunc>=1.0.12",
+    "chemprop==2.2.2",
+    "lightning",
     "numpy",
-    "pandas>=2.0.0,<2.2.0",
-    "rdkit>=2023.3.3",
+    "pandas",
+    "rdkit",
     "seaborn",
-    "torch==2.5.0",
+    "torch",
     "tqdm",
-    "typed-argument-parser>=1.9.0",
+    "typed-argument-parser>=1.11.0",
 ]
 
 [project.optional-dependencies]
-tdc = ["openpyxl", "PyTDC>=0.4.1"]
+tdc = ["openpyxl", "PyTDC==1.1.15"]
 web = ["flask", "gunicorn"]
 
 [project.urls]

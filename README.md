@@ -54,13 +54,13 @@ pip install -e .
 By default, the pip installation only includes dependencies required for making ADMET predictions, either via the
 command line or via the Python API. To install dependencies required for processing TDC data or plotting TDC results,
 run `pip install admet-ai[tdc]`. To install dependencies required for hosting the ADMET-AI web server,
-run `pip install admet-ai[web]`.
+run `pip install admet-ai[web]`. (Note: The PyTDC package may require Python version 3.10, in which case it is recommended to create a separate environment just for the TDC scripts and install PyTDC manually in that environment.)
 
 If there are version issues with the required packages, create a conda environment with specific working versions of the
 packages as follows.
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements_frozen.txt
 pip install -e .
 ```
 
