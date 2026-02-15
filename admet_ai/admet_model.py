@@ -1,13 +1,7 @@
 """ADMET-AI class to contain ADMET model and prediction function."""
 
-from multiprocessing import Pool
 from pathlib import Path
 
-from admet_ai.drugbank import (
-    create_atc_code_mapping,
-    filter_drugbank_by_atc,
-    read_drugbank_data,
-)
 import numpy as np
 import pandas as pd
 import torch
@@ -29,8 +23,11 @@ from tqdm import tqdm
 from admet_ai.constants import (
     DEFAULT_DRUGBANK_PATH,
     DEFAULT_MODELS_DIR,
-    DRUGBANK_ATC_NAME_PREFIX,
-    DRUGBANK_DELIMITER,
+)
+from admet_ai.drugbank import (
+    create_atc_code_mapping,
+    filter_drugbank_by_atc,
+    read_drugbank_data,
 )
 from admet_ai.physchem import compute_fingerprints, compute_physicochemical_properties
 from admet_ai.utils import get_drugbank_suffix
@@ -67,9 +64,7 @@ class ADMETModel:
         """
         # Check parameters
         if atc_code is not None and drugbank_path is None:
-            raise ValueError(
-                "DrugBank reference set must be provided to filter by ATC code."
-            )
+            raise ValueError("DrugBank reference set must be provided to filter by ATC code.")
 
         # Set default num_workers
         if num_workers is None:
@@ -83,9 +78,7 @@ class ADMETModel:
         self._atc_code = atc_code
 
         # Load DrugBank reference set if needed
-        self.drugbank, self.drugbank_atc_filtered = self._load_drugbank_data(
-            drugbank_path, atc_code
-        )
+        self.drugbank, self.drugbank_atc_filtered = self._load_drugbank_data(drugbank_path, atc_code)
 
         # Set device based on GPU availability
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -121,10 +114,7 @@ class ADMETModel:
 
         for model_dir in model_dirs:
             model_paths = sorted(model_dir.glob("**/*.pt"))
-            models = [
-                load_model(model_path, multicomponent=False)
-                for model_path in model_paths
-            ]
+            models = [load_model(model_path, multicomponent=False) for model_path in model_paths]
             task_names = load_output_columns(model_paths[0])
 
             self.task_lists.append(task_names)
@@ -149,14 +139,10 @@ class ADMETModel:
         """
         # Handle case of no DrugBank
         if self.drugbank is None:
-            raise ValueError(
-                "Cannot set ATC code if DrugBank reference is not provided."
-            )
+            raise ValueError("Cannot set ATC code if DrugBank reference is not provided.")
 
         # Validate ATC code
-        if atc_code is not None and atc_code not in create_atc_code_mapping(
-            self.drugbank
-        ):
+        if atc_code is not None and atc_code not in create_atc_code_mapping(self.drugbank):
             raise ValueError(f"Invalid ATC code: {atc_code}")
 
         # Save ATC code
@@ -178,13 +164,9 @@ class ADMETModel:
         mols, smiles = self._filter_valid_molecules(smiles)
 
         # Compute physicochemical properties
-        physchem_preds = compute_physicochemical_properties(
-            all_smiles=smiles, mols=mols
-        )
+        physchem_preds = compute_physicochemical_properties(all_smiles=smiles, mols=mols)
 
-        fingerprints = compute_fingerprints(
-            mols, self.use_features, self.fingerprint_multiprocessing_min
-        )
+        fingerprints = compute_fingerprints(mols, self.use_features, self.fingerprint_multiprocessing_min)
 
         data_loader = self._build_dataloader(mols, fingerprints)
 
@@ -194,9 +176,7 @@ class ADMETModel:
         admet_preds = pd.DataFrame(task_to_preds, index=smiles)
 
         # Combine physicochemical and ADMET properties
-        assert physchem_preds.index.equals(
-            admet_preds.index
-        ), "Internal Error: Indices do not match."
+        assert physchem_preds.index.equals(admet_preds.index), "Internal Error: Indices do not match."
         preds = pd.concat((physchem_preds, admet_preds), axis=1)
 
         final_predictions = self._add_drugbank_percentiles(preds, smiles)
@@ -214,32 +194,20 @@ class ADMETModel:
 
     def _filter_valid_molecules(self, smiles: list[str]):
         """Convert SMILES to RDKit molecules and filter out invalid ones."""
-        valid_mols_smiles = [
-            (Chem.MolFromSmiles(smile), smile)
-            for smile in tqdm(smiles, desc="SMILES to Mol")
-        ]
+        valid_mols_smiles = [(Chem.MolFromSmiles(smile), smile) for smile in tqdm(smiles, desc="SMILES to Mol")]
         valid_mols_smiles = [(mol, smile) for mol, smile in valid_mols_smiles if mol]
 
         if len(valid_mols_smiles) < len(smiles):
-            print(
-                f"Warning: {len(smiles) - len(valid_mols_smiles):,} invalid molecules removed."
-            )
+            print(f"Warning: {len(smiles) - len(valid_mols_smiles):,} invalid molecules removed.")
 
-        mols, filtered_smiles = (
-            zip(*valid_mols_smiles) if valid_mols_smiles else ([], [])
-        )
+        mols, filtered_smiles = zip(*valid_mols_smiles) if valid_mols_smiles else ([], [])
         return mols, filtered_smiles
 
     def _build_dataloader(self, mols, fingerprints):
         """Create a DataLoader for model predictions."""
-        data_points = [
-            MoleculeDatapoint(mol=mol, x_d=fingerprint)
-            for mol, fingerprint in zip(mols, fingerprints)
-        ]
+        data_points = [MoleculeDatapoint(mol=mol, x_d=fingerprint) for mol, fingerprint in zip(mols, fingerprints)]
         dataset = MoleculeDataset(data=data_points)
-        return build_dataloader(
-            dataset=dataset, num_workers=self.num_workers, shuffle=False
-        )
+        return build_dataloader(dataset=dataset, num_workers=self.num_workers, shuffle=False)
 
     def _make_ensemble_predictions(self, data_loader):
         """Run predictions across model ensembles."""
@@ -263,12 +231,7 @@ class ADMETModel:
                 )
 
                 # Shape of preds: (models x dataloaders x molecules x tasks [ADMET predictions])
-                preds = np.array(
-                    [
-                        trainer.predict(model=model, dataloaders=data_loader)
-                        for model in models
-                    ]
-                )
+                preds = np.array([trainer.predict(model=model, dataloaders=data_loader) for model in models])
 
                 # We perform the mean twice to merge the predictions across models and across data loaders
                 # This works under the assumption that we always have one single data loader and multiple models

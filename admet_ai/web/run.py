@@ -1,4 +1,5 @@
 """Runs the development web interface for ADMET-AI (Flask)."""
+
 import random
 import string
 from datetime import timedelta
@@ -17,9 +18,7 @@ matplotlib.use("Agg")
 
 
 def setup_web(
-    secret_key: str = "".join(
-        random.choices(string.ascii_letters + string.digits, k=20)
-    ),
+    secret_key: str = "".join(random.choices(string.ascii_letters + string.digits, k=20)),
     session_lifetime: int = 5 * 60,
     heartbeat_frequency: int = 60,
     max_molecules: int = 1000,

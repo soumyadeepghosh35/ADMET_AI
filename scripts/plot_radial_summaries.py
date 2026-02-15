@@ -1,4 +1,5 @@
 """Plots radial summaries of each molecule's most important predicted properties."""
+
 from pathlib import Path
 
 import pandas as pd
@@ -8,7 +9,9 @@ from admet_ai.plot import plot_radial_summary
 
 
 def plot_radial_summaries(
-    data_path: Path, save_dir: Path, image_type: str = "pdf",
+    data_path: Path,
+    save_dir: Path,
+    image_type: str = "pdf",
 ) -> None:
     """Plots radial summaries of each molecule's most important predicted properties.
 

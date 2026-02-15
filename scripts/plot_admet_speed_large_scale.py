@@ -1,4 +1,5 @@
 """Plot a comparison of the speed of ADMET-AI version for large-scale ADMET prediction."""
+
 from pathlib import Path
 
 import matplotlib
@@ -12,9 +13,7 @@ plt.rcParams["font.weight"] = "bold"
 plt.rcParams["axes.labelweight"] = "bold"
 
 
-def plot_admet_speed(
-    results_path: Path, save_path: Path, sheet_name: str = "ADMET Speed Large Scale"
-) -> None:
+def plot_admet_speed(results_path: Path, save_path: Path, sheet_name: str = "ADMET Speed Large Scale") -> None:
     """Plot a comparison of the speed of ADMET-AI version for large-scale ADMET prediction.
 
     :param results_path: Path to a CSV file containing the ADMET website speed results.
@@ -25,9 +24,7 @@ def plot_admet_speed(
     results = pd.read_excel(results_path, sheet_name=sheet_name)
 
     # Reformat ADMET-AI Version
-    results["ADMET-AI Version"] = results["ADMET-AI Version"].apply(
-        lambda version: version.replace(", ", "\n")
-    )
+    results["ADMET-AI Version"] = results["ADMET-AI Version"].apply(lambda version: version.replace(", ", "\n"))
 
     # Plot results
     plt.subplots(figsize=FIGSIZE)

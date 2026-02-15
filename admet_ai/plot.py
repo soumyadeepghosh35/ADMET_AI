@@ -1,4 +1,5 @@
 """Defines functions for ADMET-AI plots."""
+
 import re
 from io import BytesIO
 
@@ -142,42 +143,30 @@ def plot_radial_summary(
     # Set up properties
     properties = {
         "Blood-Brain Barrier Safe": {
-            "percentile": max_percentile
-            - property_id_to_percentile[f"BBB_Martins_{percentile_suffix}"],
+            "percentile": max_percentile - property_id_to_percentile[f"BBB_Martins_{percentile_suffix}"],
         },
         "Non-\nToxic": {
-            "percentile": max_percentile
-            - property_id_to_percentile[f"ClinTox_{percentile_suffix}"],
+            "percentile": max_percentile - property_id_to_percentile[f"ClinTox_{percentile_suffix}"],
             "vertical_alignment": "bottom",
         },
         "Soluble": {
-            "percentile": property_id_to_percentile[
-                f"Solubility_AqSolDB_{percentile_suffix}"
-            ],
+            "percentile": property_id_to_percentile[f"Solubility_AqSolDB_{percentile_suffix}"],
             "vertical_alignment": "top",
         },
         "Bioavailable": {
-            "percentile": property_id_to_percentile[
-                f"Bioavailability_Ma_{percentile_suffix}"
-            ],
+            "percentile": property_id_to_percentile[f"Bioavailability_Ma_{percentile_suffix}"],
             "vertical_alignment": "top",
         },
         "hERG\nSafe": {
-            "percentile": max_percentile
-            - property_id_to_percentile[f"hERG_{percentile_suffix}"],
+            "percentile": max_percentile - property_id_to_percentile[f"hERG_{percentile_suffix}"],
             "vertical_alignment": "bottom",
         },
     }
     property_names = [property_name for property_name in properties]
-    percentiles = [
-        properties[property_name]["percentile"] for property_name in properties
-    ]
+    percentiles = [properties[property_name]["percentile"] for property_name in properties]
 
     # Calculate the angles of the plot (angles start at pi / 2 and go counter-clockwise)
-    angles = (
-        (np.linspace(0, 2 * np.pi, len(properties), endpoint=False) + np.pi / 2)
-        % (2 * np.pi)
-    ).tolist()
+    angles = ((np.linspace(0, 2 * np.pi, len(properties), endpoint=False) + np.pi / 2) % (2 * np.pi)).tolist()
 
     # Complete the loop
     percentiles += percentiles[:1]

@@ -1,4 +1,5 @@
 """Defines the routes of the ADMET-AI Flask app."""
+
 from uuid import uuid4
 from tempfile import NamedTemporaryFile
 
@@ -51,9 +52,7 @@ def render(**kwargs) -> str:
         max_molecules=app.config["MAX_MOLECULES"],
         max_visible_molecules=app.config["MAX_VISIBLE_MOLECULES"],
         low_performance_threshold=app.config["LOW_PERFORMANCE_THRESHOLD"],
-        drugbank_approved_percentile_suffix=get_drugbank_suffix(
-            session.get("atc_code")
-        ),
+        drugbank_approved_percentile_suffix=get_drugbank_suffix(session.get("atc_code")),
         drugbank_size=get_drugbank_size(session.get("atc_code")),
         drugbank_total_size=get_drugbank_size(),
         atc_code=session.get("atc_code") or "all",
@@ -92,14 +91,9 @@ def index() -> str:
         return render(errors=[error])
 
     # Error if too many molecules
-    if (
-        app.config["MAX_MOLECULES"] is not None
-        and len(all_smiles) > app.config["MAX_MOLECULES"]
-    ):
+    if app.config["MAX_MOLECULES"] is not None and len(all_smiles) > app.config["MAX_MOLECULES"]:
         return render(
-            errors=[
-                f"Received too many molecules. Maximum number of molecules is {app.config['MAX_MOLECULES']:,}."
-            ]
+            errors=[f"Received too many molecules. Maximum number of molecules is {app.config['MAX_MOLECULES']:,}."]
         )
 
     # Convert SMILES to RDKit molecules
@@ -191,7 +185,11 @@ def set_atc_code() -> Response:
     drugbank_size = get_drugbank_size(session.get("atc_code"))
 
     # Send new DrugBank size
-    return jsonify({"drugbank_size_string": f"{drugbank_size:,}",})
+    return jsonify(
+        {
+            "drugbank_size_string": f"{drugbank_size:,}",
+        }
+    )
 
 
 @app.route("/drugbank_plot", methods=["GET"])
@@ -201,12 +199,8 @@ def drugbank_plot() -> Response:
     :return: A JSON response containing the SVG of the plot.
     """
     # Get requested X and Y axes and store in session
-    session["drugbank_x_task_name"] = request.args.get(
-        "x_task", default=session.get("drugbank_x_task_name"), type=str
-    )
-    session["drugbank_y_task_name"] = request.args.get(
-        "y_task", default=session.get("drugbank_y_task_name"), type=str
-    )
+    session["drugbank_x_task_name"] = request.args.get("x_task", default=session.get("drugbank_x_task_name"), type=str)
+    session["drugbank_y_task_name"] = request.args.get("y_task", default=session.get("drugbank_y_task_name"), type=str)
 
     # Create DrugBank reference plot with ATC code
     drugbank_plot_svg = plot_drugbank_reference(
@@ -241,9 +235,7 @@ def download_predictions() -> Response:
     preds_file.seek(0)
 
     # Return the temporary file as a response
-    return send_file(
-        preds_file.name, as_attachment=True, download_name="predictions.csv"
-    )
+    return send_file(preds_file.name, as_attachment=True, download_name="predictions.csv")
 
 
 @app.route("/heartbeat", methods=["POST"])

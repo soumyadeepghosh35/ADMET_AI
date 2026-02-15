@@ -50,18 +50,14 @@ def prepare_tdc_admet_group(raw_data_dir: Path, save_dir: Path) -> None:
             dataset_dir = save_dir / data_name / str(seed)
             dataset_dir.mkdir(parents=True, exist_ok=True)
             # Get train and val split
-            train, valid = group.get_train_valid_split(
-                benchmark=benchmark["name"], split_type="default", seed=seed
-            )
+            train, valid = group.get_train_valid_split(benchmark=benchmark["name"], split_type="default", seed=seed)
 
             # Assign 'train' and 'val' to corresponding rows
             train_val_data.loc[train.index, "split"] = "train"
             train_val_data.loc[valid.index, "split"] = "val"
 
             # Combine train_val and test into a single dataset
-            combined_data = pd.concat([train_val_data, test_data]).reset_index(
-                drop=True
-            )
+            combined_data = pd.concat([train_val_data, test_data]).reset_index(drop=True)
 
             # Add dataset name and seed for reference
             combined_data["dataset"] = data_name
@@ -76,9 +72,7 @@ def prepare_tdc_admet_group(raw_data_dir: Path, save_dir: Path) -> None:
 
         # Compute class balance
         if DATASET_TO_TYPE_LOWER[data_name] == "classification":
-            class_balance = data[ADMET_GROUP_TARGET_COLUMN].value_counts(
-                normalize=True
-            )[1]
+            class_balance = data[ADMET_GROUP_TARGET_COLUMN].value_counts(normalize=True)[1]
         else:
             class_balance = None
 

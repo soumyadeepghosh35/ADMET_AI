@@ -17,7 +17,6 @@ from admet_ai.constants import (
     DRUGBANK_SMILES_COLUMN,
 )
 
-
 DRUGBANK_DF = pd.DataFrame()
 ATC_CODE_TO_DRUGBANK_INDICES: dict[str, list[int]] = {}
 
@@ -40,9 +39,7 @@ def load_drugbank(drugbank_path: Path = DEFAULT_DRUGBANK_PATH) -> None:
 def read_drugbank_data(drugbank_path: Path) -> pd.DataFrame:
     """Load the drugbank data and returns a dataframe"""
     if not drugbank_path.exists():
-        raise FileNotFoundError(
-            f"The path to the drugbank archive is not correct: {drugbank_path}"
-        )
+        raise FileNotFoundError(f"The path to the drugbank archive is not correct: {drugbank_path}")
 
     drugbank = pd.read_csv(drugbank_path)
     return drugbank
@@ -59,10 +56,7 @@ def create_atc_code_mapping(drugbank: pd.DataFrame) -> dict:
                 for atc_code in atc_codes.split(DRUGBANK_DELIMITER):
                     atc_code_to_drugbank_indices[atc_code.lower()].add(idx)
 
-    return {
-        atc_code: sorted(indices)
-        for atc_code, indices in atc_code_to_drugbank_indices.items()
-    }
+    return {atc_code: sorted(indices) for atc_code, indices in atc_code_to_drugbank_indices.items()}
 
 
 def filter_drugbank_by_atc(atc_code: str, drugbank: pd.DataFrame) -> pd.DataFrame:
@@ -116,11 +110,7 @@ def get_drugbank_unique_atc_codes() -> list[str]:
     return sorted(
         {
             atc_code.lower()
-            for atc_column in [
-                column
-                for column in drugbank.columns
-                if column.startswith(DRUGBANK_ATC_NAME_PREFIX)
-            ]
+            for atc_column in [column for column in drugbank.columns if column.startswith(DRUGBANK_ATC_NAME_PREFIX)]
             for atc_codes in drugbank[atc_column].dropna().str.split(DRUGBANK_DELIMITER)
             for atc_code in atc_codes
         }
@@ -139,9 +129,7 @@ def get_drugbank_tasks_ids() -> list[str]:
         DRUGBANK_ID_COLUMN,
         DRUGBANK_NAME_COLUMN,
         DRUGBANK_SMILES_COLUMN,
-    ] + [
-        column for column in drugbank.columns if column.startswith(DRUGBANK_ATC_PREFIX)
-    ]
+    ] + [column for column in drugbank.columns if column.startswith(DRUGBANK_ATC_PREFIX)]
     task_columns = set(drugbank.columns) - set(non_task_columns)
     drugbank_task_ids = sorted(task_columns)
 

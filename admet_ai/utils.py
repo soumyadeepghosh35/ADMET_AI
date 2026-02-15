@@ -1,12 +1,11 @@
 """Utility functions for ADMET-AI."""
+
 from pathlib import Path
 
 import pandas as pd
 
 
-def load_and_preprocess_data(
-    data_path: Path, smiles_column: str = "smiles"
-) -> pd.DataFrame:
+def load_and_preprocess_data(data_path: Path, smiles_column: str = "smiles") -> pd.DataFrame:
     """Preprocess a dataset of molecules by removing missing SMILES and setting the SMILES as the index.
 
     :param data_path: Path to a CSV file containing a dataset of molecules.

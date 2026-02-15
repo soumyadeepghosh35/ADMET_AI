@@ -48,9 +48,7 @@ PHYSCHEM_PROPERTY_TO_FUNCTION = {
 }
 
 
-def compute_physicochemical_properties(
-    all_smiles: list[str], mols: list[Chem.Mol] | None = None
-) -> pd.DataFrame:
+def compute_physicochemical_properties(all_smiles: list[str], mols: list[Chem.Mol] | None = None) -> pd.DataFrame:
     """Compute physicochemical properties for a list of molecules.
 
     :param all_smiles: A list of SMILES.
@@ -78,9 +76,7 @@ def compute_physicochemical_properties(
     return physchem_properties
 
 
-def compute_fingerprints(
-    mols: list[Chem.Mol], use_features: bool, min_parallel: int = 100
-) -> np.array:
+def compute_fingerprints(mols: list[Chem.Mol], use_features: bool, min_parallel: int = 100) -> np.array:
     """Compute RDKit fingerprints if required using multiprocessing.
 
     If not using rdkit features, returns a list of None"""

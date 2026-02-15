@@ -1,4 +1,5 @@
 """Plot results from TDC Leaderboard and TDC Single-Task and Multi-Task."""
+
 from collections import defaultdict
 from pathlib import Path
 
@@ -63,13 +64,12 @@ def plot_tdc_leaderboard_ranks(
 
     # Compute ranks for each model that is evaluated on all datasets
     dataset_model_ranks = pd.DataFrame(
-        {model: model_to_ranks[model] for model in all_dataset_models}, index=datasets,
+        {model: model_to_ranks[model] for model in all_dataset_models},
+        index=datasets,
     )
 
     # Sort models by average rank
-    models_by_average_rank = sorted(
-        all_dataset_models, key=lambda model: np.mean(dataset_model_ranks[model])
-    )
+    models_by_average_rank = sorted(all_dataset_models, key=lambda model: np.mean(dataset_model_ranks[model]))
     dataset_model_ranks = dataset_model_ranks[models_by_average_rank]
 
     # Melt dataframe for plotting
@@ -83,14 +83,17 @@ def plot_tdc_leaderboard_ranks(
         "CNN (DeepPurpose)": "CNN",
     }
 
-    model_ranks["Model"] = model_ranks["Model"].apply(
-        lambda model: model_to_new_name.get(model, model)
-    )
+    model_ranks["Model"] = model_ranks["Model"].apply(lambda model: model_to_new_name.get(model, model))
 
     # Plot the ranks for each model that is evaluated on all datasets
     fig, ax = plt.subplots(figsize=FIGSIZE)
     sns.barplot(
-        x="Rank", y="Model", data=model_ranks, hue="Model", ax=ax, errorbar="se",
+        x="Rank",
+        y="Model",
+        data=model_ranks,
+        hue="Model",
+        ax=ax,
+        errorbar="se",
     )
     ax.set_ylabel("")
     plt.tight_layout()
@@ -133,25 +136,15 @@ def plot_tdc_leaderboard_results(
             fig, ax = plt.subplots(figsize=FIGSIZE)
             axes = [ax]
 
-        metric_dataset_names = leaderboard_results[
-            leaderboard_results["Leaderboard Metric"] == metric
-        ]["Dataset"]
+        metric_dataset_names = leaderboard_results[leaderboard_results["Leaderboard Metric"] == metric]["Dataset"]
 
         for j, metric_dataset_name in enumerate(metric_dataset_names):
             dataset_results = results.parse(metric_dataset_name)
             dataset_results["Dataset"] = metric_dataset_name
-            dataset_results[metric] = dataset_results[metric].apply(
-                lambda val: float(val.split(" ")[0])
-            )
-            leaderboard_partial_data = dataset_results[
-                ~dataset_results["Model"].isin(all_dataset_models)
-            ]
-            leaderboard_all_data = dataset_results[
-                dataset_results["Model"].isin(all_dataset_models)
-            ]
-            chemprop_rdkit_data = dataset_results[
-                dataset_results["Model"] == "Chemprop-RDKit"
-            ]
+            dataset_results[metric] = dataset_results[metric].apply(lambda val: float(val.split(" ")[0]))
+            leaderboard_partial_data = dataset_results[~dataset_results["Model"].isin(all_dataset_models)]
+            leaderboard_all_data = dataset_results[dataset_results["Model"].isin(all_dataset_models)]
+            chemprop_rdkit_data = dataset_results[dataset_results["Model"] == "Chemprop-RDKit"]
 
             for k, ax in enumerate(axes):
                 sns.scatterplot(
@@ -161,9 +154,7 @@ def plot_tdc_leaderboard_results(
                     ax=ax,
                     color=sns.color_palette()[0],
                     s=SCATTER_SIZE,
-                    label="Leaderboard (partial)"
-                    if j == 0 and k == len(axes) - 1
-                    else None,
+                    label="Leaderboard (partial)" if j == 0 and k == len(axes) - 1 else None,
                     marker="x",
                 )
                 sns.scatterplot(
@@ -173,9 +164,7 @@ def plot_tdc_leaderboard_results(
                     ax=ax,
                     color=sns.color_palette()[0],
                     s=SCATTER_SIZE,
-                    label="Leaderboard (all)"
-                    if j == 0 and k == len(axes) - 1
-                    else None,
+                    label="Leaderboard (all)" if j == 0 and k == len(axes) - 1 else None,
                     marker="o",
                 )
                 sns.scatterplot(
@@ -209,9 +198,7 @@ def plot_tdc_leaderboard_results(
         plt.close()
 
 
-def plot_tdc_leaderboard_single_vs_ensemble(
-    results: pd.ExcelFile, save_dir: Path
-) -> None:
+def plot_tdc_leaderboard_single_vs_ensemble(results: pd.ExcelFile, save_dir: Path) -> None:
     """Plot results from TDC Leaderboard single model vs ensemble model.
 
     :param results: Excel file containing results.
@@ -258,7 +245,10 @@ def plot_tdc_leaderboard_single_vs_ensemble(
         )
         means = results.melt(
             id_vars="Dataset",
-            value_vars=["Single", "Ensemble",],
+            value_vars=[
+                "Single",
+                "Ensemble",
+            ],
             var_name="Model Type",
             value_name=metric,
         )
@@ -267,7 +257,11 @@ def plot_tdc_leaderboard_single_vs_ensemble(
         for ax in axes:
             # Add mean bars
             sns.barplot(
-                x=metric, y="Dataset", hue="Model Type", data=means, ax=ax,
+                x=metric,
+                y="Dataset",
+                hue="Model Type",
+                data=means,
+                ax=ax,
             )
 
             # Add standard deviation for single model
@@ -291,7 +285,10 @@ def plot_tdc_leaderboard_single_vs_ensemble(
             split_axes(axes)
 
             fig.text(
-                0.625, 0.04, metric, ha="center",
+                0.625,
+                0.04,
+                metric,
+                ha="center",
             )
         else:
             axes[0].set_ylabel("")
@@ -301,15 +298,11 @@ def plot_tdc_leaderboard_single_vs_ensemble(
         if metric == "MAE":
             fig.subplots_adjust(bottom=0.1)
 
-        plt.savefig(
-            save_dir / f"single_vs_ensemble_{metric.lower()}.pdf", bbox_inches="tight"
-        )
+        plt.savefig(save_dir / f"single_vs_ensemble_{metric.lower()}.pdf", bbox_inches="tight")
         plt.close()
 
 
-def plot_tdc_single_task_vs_multi_task_results(
-    results: pd.ExcelFile, save_dir: Path
-) -> None:
+def plot_tdc_single_task_vs_multi_task_results(results: pd.ExcelFile, save_dir: Path) -> None:
     """Plot results from TDC Single-Task and Multi-Task.
 
     :param results: Excel file containing results.
@@ -356,14 +349,12 @@ def plot_tdc_single_task_vs_multi_task_results(
             f"Multitask {metric} Standard Deviation": "Multi Task",
         }
 
-        results_all_mean_single_vs_multi[
-            "Task Type"
-        ] = results_all_mean_single_vs_multi["Task Type"].apply(
+        results_all_mean_single_vs_multi["Task Type"] = results_all_mean_single_vs_multi["Task Type"].apply(
             lambda task_type: task_type_mapping[task_type]
         )
-        results_all_std_single_vs_multi["Task Type"] = results_all_std_single_vs_multi[
-            "Task Type"
-        ].apply(lambda task_type: task_type_mapping[task_type])
+        results_all_std_single_vs_multi["Task Type"] = results_all_std_single_vs_multi["Task Type"].apply(
+            lambda task_type: task_type_mapping[task_type]
+        )
 
         if metric == "MAE":
             fig, axes = plt.subplots(1, 2, sharey=True, figsize=FIGSIZE)
@@ -406,7 +397,10 @@ def plot_tdc_single_task_vs_multi_task_results(
             split_axes(axes)
 
             fig.text(
-                0.65, 0.04, f"{metric} Mean", ha="center",
+                0.65,
+                0.04,
+                f"{metric} Mean",
+                ha="center",
             )
         else:
             axes[0].set_ylabel("")
@@ -439,9 +433,7 @@ def plot_tdc_results(results_path: Path, save_dir: Path) -> None:
     # Get TDC Leaderboard results
     regression_leaderboard = results.parse("TDC Leaderboard Regression")
     classification_leaderboard = results.parse("TDC Leaderboard Classification")
-    leaderboard_results = pd.concat(
-        [regression_leaderboard, classification_leaderboard]
-    )
+    leaderboard_results = pd.concat([regression_leaderboard, classification_leaderboard])
 
     # Map each model to its set of ranks
     model_to_ranks = defaultdict(list)
@@ -452,13 +444,7 @@ def plot_tdc_results(results_path: Path, save_dir: Path) -> None:
             model_to_ranks[model].append(index + 1)
 
     # Determine which models are evaluated on all datasets
-    all_dataset_models = sorted(
-        {
-            model
-            for model, ranks in model_to_ranks.items()
-            if len(ranks) == len(datasets)
-        }
-    )
+    all_dataset_models = sorted({model for model, ranks in model_to_ranks.items() if len(ranks) == len(datasets)})
     print(f"Number of models: {len(model_to_ranks):,}")
     print(f"Number of models evaluated on all datasets: {len(all_dataset_models):,}")
 

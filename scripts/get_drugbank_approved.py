@@ -1,4 +1,5 @@
 """Script to get the names and SMILES for approved drugs from the DrugBank database."""
+
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -39,11 +40,7 @@ def get_approved_smiles_from_drugbank(data_path: Path, save_path: Path) -> None:
     for drug in tqdm(drugs):
         # Get DrugBank ID
         drugbank_ids = drug.findall("db:drugbank-id", DRUGBANK_NAMESPACES)
-        drugbank_ids = tuple(
-            drugbank_id.text
-            for drugbank_id in drugbank_ids
-            if drugbank_id.text.startswith("DB")
-        )
+        drugbank_ids = tuple(drugbank_id.text for drugbank_id in drugbank_ids if drugbank_id.text.startswith("DB"))
 
         # DrugBank ID length validation
         if len(drugbank_ids) == 0:
@@ -70,9 +67,7 @@ def get_approved_smiles_from_drugbank(data_path: Path, save_path: Path) -> None:
             continue
 
         # Get calculated properties to determine SMILES
-        calculated_properties_list = drug.findall(
-            "db:calculated-properties", DRUGBANK_NAMESPACES
-        )
+        calculated_properties_list = drug.findall("db:calculated-properties", DRUGBANK_NAMESPACES)
 
         # Calculated properties length validation
         if len(calculated_properties_list) == 0:
@@ -81,9 +76,7 @@ def get_approved_smiles_from_drugbank(data_path: Path, save_path: Path) -> None:
             raise ValueError("More than one calculated-properties list found")
 
         smiles = None
-        for prop in calculated_properties_list[0].findall(
-            "db:property", DRUGBANK_NAMESPACES
-        ):
+        for prop in calculated_properties_list[0].findall("db:property", DRUGBANK_NAMESPACES):
             kind = prop.find("db:kind", DRUGBANK_NAMESPACES)
             value = prop.find("db:value", DRUGBANK_NAMESPACES)
             new_smiles = value.text
@@ -147,10 +140,7 @@ def get_approved_smiles_from_drugbank(data_path: Path, save_path: Path) -> None:
             DRUGBANK_NAME_COLUMN: approved_names,
             DRUGBANK_ID_COLUMN: [DRUGBANK_DELIMITER.join(ids) for ids in approved_ids],
             DRUGBANK_SMILES_COLUMN: approved_smiles,
-            DRUGBANK_ATC_CODE_COLUMN: [
-                DRUGBANK_DELIMITER.join(sorted(atc_codes))
-                for atc_codes in approved_atc_codes
-            ],
+            DRUGBANK_ATC_CODE_COLUMN: [DRUGBANK_DELIMITER.join(sorted(atc_codes)) for atc_codes in approved_atc_codes],
             **{
                 f"{DRUGBANK_ATC_NAME_PREFIX}_{level}": [
                     DRUGBANK_DELIMITER.join(sorted(level_to_atc_names[level]))

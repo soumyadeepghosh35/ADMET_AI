@@ -1,4 +1,5 @@
 """Merge all the Therapeutics Data Commons (TDC) ADMET datasets into multitask datasets for regression and classification."""
+
 from functools import reduce
 from pathlib import Path
 
@@ -37,15 +38,11 @@ def merge_tdc_admet_all(data_dir: Path, save_dir: Path) -> None:
 
     # Merge datasets
     regression_data = reduce(
-        lambda left, right: pd.merge(
-            left, right, how="outer", on=ADMET_ALL_SMILES_COLUMN
-        ),
+        lambda left, right: pd.merge(left, right, how="outer", on=ADMET_ALL_SMILES_COLUMN),
         regression_data,
     )
     classification_data = reduce(
-        lambda left, right: pd.merge(
-            left, right, how="outer", on=ADMET_ALL_SMILES_COLUMN
-        ),
+        lambda left, right: pd.merge(left, right, how="outer", on=ADMET_ALL_SMILES_COLUMN),
         classification_data,
     )
 

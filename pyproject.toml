@@ -69,7 +69,7 @@ admet_ai = [
 ]
 
 [tool.black]
-line-length = 121
+line-length = 120
 
 [tool.setuptools.dynamic]
 version = { attr = "admet_ai.__version__" }

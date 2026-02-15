@@ -3,7 +3,6 @@
 from tdc.single_pred import ADME, Tox
 from tdc.utils import retrieve_label_name_list
 
-
 TDC_DATASET_TO_CLASS = {
     "Caco2_Wang": ADME,
     "PAMPA_NCATS": ADME,
@@ -88,9 +87,7 @@ DATASET_TO_TYPE = {
     "admet_regression": "regression",
     "admet_classification": "classification",
 }
-DATASET_TO_TYPE_LOWER = {
-    dataset.lower(): dataset_type for dataset, dataset_type in DATASET_TO_TYPE.items()
-}
+DATASET_TO_TYPE_LOWER = {dataset.lower(): dataset_type for dataset, dataset_type in DATASET_TO_TYPE.items()}
 DATASET_TYPE_TO_METRICS_COMMAND_LINE = {
     "classification": ["--metrics", "roc", "prc"],
     "regression": ["--metrics", "mae", "r2"],

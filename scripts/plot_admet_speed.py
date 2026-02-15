@@ -1,4 +1,5 @@
 """Plot a comparison of the speed of ADMET websites."""
+
 from pathlib import Path
 
 import matplotlib
@@ -29,19 +30,18 @@ def plot_admet_speed(
     results = pd.read_excel(results_path, sheet_name=sheet_name)
 
     # Melt results for seaborn plotting
-    results = results.melt(
-        id_vars="Website", var_name="Number of Molecules", value_name="Time (s)"
-    )
+    results = results.melt(id_vars="Website", var_name="Number of Molecules", value_name="Time (s)")
 
     # Reformat number of molecules (e.g., "1,000 molecules" -> "1,000")
-    results["Number of Molecules"] = results["Number of Molecules"].apply(
-        lambda num: num.split(" ")[0]
-    )
+    results["Number of Molecules"] = results["Number of Molecules"].apply(lambda num: num.split(" ")[0])
 
     # Plot results
     fig, ax = plt.subplots(figsize=FIGSIZE)
     sns.barplot(
-        x="Number of Molecules", y="Time (s)", hue="Website", data=results,
+        x="Number of Molecules",
+        y="Time (s)",
+        hue="Website",
+        data=results,
     )
 
     # Limit y-axis

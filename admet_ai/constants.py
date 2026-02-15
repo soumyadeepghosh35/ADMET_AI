@@ -2,7 +2,6 @@
 
 from importlib import resources
 
-
 # Paths to data and models
 with resources.path("admet_ai", "resources") as resources_dir:
     DEFAULT_ADMET_PATH = resources_dir / "data" / "admet.csv"

@@ -1,4 +1,5 @@
 """Contains global variables for use in the ADMET-AI website."""
+
 import time
 
 import pandas as pd
@@ -42,6 +43,4 @@ def cleanup_storage() -> None:
                 del USER_TO_LAST_ACTIVITY[user_id]
                 num_removed += 1
 
-        print(
-            f"Cleanup removed data from {num_removed:,} users with {len(USER_TO_PREDS):,} users remaining."
-        )
+        print(f"Cleanup removed data from {num_removed:,} users with {len(USER_TO_PREDS):,} users remaining.")

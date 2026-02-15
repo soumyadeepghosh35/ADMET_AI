@@ -1,4 +1,5 @@
 """Plots a scatter plot of two properties of molecules compared to the DrugBank reference set."""
+
 from pathlib import Path
 
 import pandas as pd

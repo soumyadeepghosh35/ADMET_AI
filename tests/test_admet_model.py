@@ -78,6 +78,5 @@ def test_admet_model_prediction_consistency(model):
             actual_predictions[key],
             expected_value,
             rel=1e-5,
-            msg=f"Prediction for {key} has changed. Expected: {expected_value}, "
-            f"but got: {actual_predictions[key]}",
+            msg=f"Prediction for {key} has changed. Expected: {expected_value}, " f"but got: {actual_predictions[key]}",
         )

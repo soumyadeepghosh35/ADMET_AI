@@ -1,4 +1,5 @@
 """Download and prepare all the Therapeutics Data Commons (TDC) ADMET datasets."""
+
 from pathlib import Path
 
 import pandas as pd
@@ -26,9 +27,7 @@ def prepare_tdc_admet_all(save_dir: Path, skip_datasets: list[str] = None) -> No
     # Skip datasets
     if skip_datasets is not None:
         dataset_to_class = {
-            dataset: data_class
-            for dataset, data_class in dataset_to_class.items()
-            if dataset not in skip_datasets
+            dataset: data_class for dataset, data_class in dataset_to_class.items() if dataset not in skip_datasets
         }
 
     # Create save directory
@@ -51,9 +50,7 @@ def prepare_tdc_admet_all(save_dir: Path, skip_datasets: list[str] = None) -> No
 
         # Get data for each label
         for label_name in tqdm(label_names, desc="Labels"):
-            label_data = data_class(
-                name=tdc_data_name, label_name=label_name, path=save_dir
-            ).get_data()
+            label_data = data_class(name=tdc_data_name, label_name=label_name, path=save_dir).get_data()
             data.append(
                 dict(
                     zip(
@@ -64,9 +61,7 @@ def prepare_tdc_admet_all(save_dir: Path, skip_datasets: list[str] = None) -> No
             )
 
         # Get all SMILES
-        smiles = sorted(
-            set.union(*[set(smiles_to_target) for smiles_to_target in data])
-        )
+        smiles = sorted(set.union(*[set(smiles_to_target) for smiles_to_target in data]))
 
         # Rename None label name to dataset name
         if label_names == [None]:
