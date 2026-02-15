@@ -19,7 +19,7 @@ Distribution,BBB_Martins,Blood-Brain Barrier Penetration,1975,classification,-,0
 Distribution,PPBR_AZ,Plasma Protein Binding Rate,1614,regression,%,0,100,human,3,,,0.462089051,7.754102431,https://tdcommons.ai/single_pred_tasks/adme/#ppbr-plasma-protein-binding-rate-astrazeneca
 Distribution,VDss_Lombardo,Volume of Distribution at Steady State,1111,regression,L/kg,0,inf,human,10,,,-0.610145027,5.890426238,https://tdcommons.ai/single_pred_tasks/adme/#vdss-volumn-of-distribution-at-steady-state-lombardo-et-al
 Excretion,Half_Life_Obach,Half Life,665,regression,hr,0,inf,human,7,,,-1.551572848,31.04670644,https://tdcommons.ai/single_pred_tasks/adme/#half-life-obach-et-al
-Excretion,Clearance_Hepatocyte_AZ,Drug Clearance (Hepatocyte),1020,regression,uL/min/10^6 cells,0,inf,human,4,,,0.302233775,31.562803,https://tdcommons.ai/single_pred_tasks/adme/#clearance-astrazeneca
+Excretion,Clearance_Hepatocyte_AZ,Drug Clearance (Hepatocyte),1020,regression,uL/min/10^6 cells,0,inf,human & rat,4,,,0.302233775,31.562803,https://tdcommons.ai/single_pred_tasks/adme/#clearance-astrazeneca
 Excretion,Clearance_Microsome_AZ,Drug Clearance (Microsome),1102,regression,uL/min/mg,0,inf,human,2,,,0.300325493,25.2952124,https://tdcommons.ai/single_pred_tasks/adme/#clearance-astrazeneca
 Metabolism,CYP1A2_Veith,CYP1A2 Inhibition,12579,classification,-,0,1,human,-,0.934630479,0.941599044,,,https://tdcommons.ai/single_pred_tasks/adme/#cyp-p450-1a2-inhibition-veith-et-al
 Metabolism,CYP2C19_Veith,CYP2C19 Inhibition,12665,classification,-,0,1,human,-,0.882382711,0.907060295,,,https://tdcommons.ai/single_pred_tasks/adme/#cyp-p450-2c19-inhibition-veith-et-al
