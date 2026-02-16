@@ -28,7 +28,7 @@ def tdc_admet_group_evaluate(data_dir: Path, preds_dir: Path) -> None:
         predictions = {}
 
         for name in names:
-            preds_path = preds_dir / name / str(seed) / "test_preds.csv"
+            preds_path = preds_dir / name / str(seed) / "model_0" / "test_predictions.csv"
             preds = pd.read_csv(preds_path)
             predictions[name] = preds[ADMET_GROUP_TARGET_COLUMN].values
 

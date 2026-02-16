@@ -6,21 +6,13 @@ This document provides step-by-step instructions for reproducing the ADMET-AI mo
 - [Create multitask datasets for regression and classification](#create-multitask-datasets-for-regression-and-classification)
 - [Create a single dataset with all TDC ADMET data](#create-a-single-dataset-with-all-tdc-admet-data)
 - [Train Chemprop ADMET predictors](#train-Chemprop-admet-predictors)
-- [Evaluate TDC ADMET Benchmark Group models](#evaluate-tdc-admet-benchmark-group-models)
+- [Evaluate Chemprop ADMET predictors](#evaluate-chemprop-admet-predictors)
 - [Get approved drugs from DrugBank](#get-approved-drugs-from-drugbank)
 - [Make predictions on DrugBank approved drugs](#make-predictions-on-drugbank-approved-drugs)
 
 ## Download TDC ADMET data
 
-For the following download commands only, use a Python environment that contains `PyTDC==1.1.15` and `typed-argument-parser`. (Note that PyTDC is incompatible with the other requirements in ADMET-AI.)
-
-Download the [TDC ADMET Benchmark Group](https://tdcommons.ai/benchmark/admet_group/overview/) data (v1.1.15) for evaluating models using scaffold splits in order to compare to the TDC leaderboard.
-
-```bash
-python scripts/prepare_tdc_admet_group.py \
-    --raw_data_dir data/tdc_admet_group_raw \
-    --save_dir data/tdc_admet_group
-```
+For the following download command only, use a Python environment that contains `PyTDC==1.1.15` and `typed-argument-parser`. (Note that PyTDC is incompatible with the other requirements in ADMET-AI.)
 
 Download all TDC [ADME](https://tdcommons.ai/single_pred_tasks/adme/) and [Tox](https://tdcommons.ai/single_pred_tasks/tox/) datasets for training models. Skip datasets that are redundant or not needed.
 
@@ -33,12 +25,6 @@ python scripts/prepare_tdc_admet_all.py \
 ## Filter for valid molecules
 
 Filter all the CSV files to ensure SMILES result in valid RDKit molecules. (Make sure to use the general ADMET-AI Python environment with an up-to-date RDKit.)
-
-```bash
-python scripts/filter_valid_molecules.py \
-    --data_dir data/tdc_admet_group \
-    --smiles_column Drug
-```
 
 ```bash
 python scripts/filter_valid_molecules.py \
@@ -56,39 +42,9 @@ python scripts/merge_tdc_admet_multitask.py \
     --save_dir data/tdc_admet_all_multitask
 ```
 
-## Create a single dataset with all TDC ADMET data
-
-Create a single dataset with all TDC ADMET data, primarily for the purpose of searching across the TDC data.
-
-```bash
-python scripts/merge_tdc_admet_all.py \
-    --data_dir data/tdc_admet_all \
-    --save_path data/tdc_admet_all.csv
-```
-
 ## Train Chemprop ADMET predictors
 
-Train Chemprop predictors on the ADMET data. Note: A GPU is used by default if available.
-
-Train Chemprop ADMET predictors on the TDC ADMET Benchmark Group data.
-
-```bash
-python scripts/train_tdc_admet_group.py \
-    --data_dir data/tdc_admet_group \
-    --save_dir models/tdc_admet_group \
-    --model_type chemprop
-```
-
-Train Chemprop ADMET predictors on all TDC ADMET datasets.
-
-```bash
-python scripts/train_tdc_admet_all.py \
-    --data_dir data/tdc_admet_all \
-    --save_dir models/tdc_admet_all \
-    --model_type chemprop
-```
-
-Train Chemprop ADMET predictors on the TDC ADMET multitask datasets.
+Train Chemprop ADMET predictors on the TDC ADMET multitask datasets. Note: A GPU is used by default if available.
 
 ```bash
 python scripts/train_tdc_admet_all.py \
@@ -97,14 +53,15 @@ python scripts/train_tdc_admet_all.py \
     --model_type chemprop
 ```
 
-## Evaluate TDC ADMET Benchmark Group models
+## Evaluate Chemprop ADMET predictors
 
-Evaluate Chemprop ADMET predictors trained on the TDC ADMET Benchmark Group data.
+Evaluate Chemprop ADMET predictors trained on the TDC ADMET Benchmark Group data. (Note: The PyTDC environment should be used for this command.)
 
 ```bash
-python scripts/evaluate_tdc_admet_group.py \
-    --data_dir data/tdc_admet_group_raw \
-    --preds_dir models/tdc_admet_group/chemprop
+python scripts/evaluate_tdc_admet_all_multitask.py \
+    --data_dir data/tdc_admet_all_multitask \
+    --preds_dir models/tdc_admet_all_multitask/chemprop \
+    --save_dir results/tdc_admet_all_multitask
 ```
 
 ## Get approved drugs from DrugBank

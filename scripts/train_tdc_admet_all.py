@@ -47,7 +47,7 @@ def train_tdc_admet_all(
             "--num-replicates",
             str(num_replicates),
             "--save-dir",
-            save_dir / model_type / data_name,
+            str(save_dir / model_type / data_name),
         ]
 
         if model_type == "chemprop_rdkit":
