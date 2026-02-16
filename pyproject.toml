@@ -39,14 +39,14 @@ dependencies = [
     "pandas",
     "rdkit",
     "seaborn",
-    "torch",
-    "tqdm",
+    "torch>=2.8.0",
+    "tqdm>=4.66.3",
     "typed-argument-parser>=1.11.0",
 ]
 
 [project.optional-dependencies]
 tdc = ["openpyxl", "PyTDC==1.1.15"]
-web = ["flask", "gunicorn"]
+web = ["flask", "gunicorn>=22.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/swansonk14/admet_ai"
