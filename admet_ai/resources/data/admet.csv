@@ -7,6 +7,9 @@ Physicochemical,Lipinski,Lipinski Rule of 5,,regression,# of 4,0,4,-,,,,,,https:
 Physicochemical,QED,Quantitative Estimate of Druglikeness (QED),,regression,-,0,1,-,,,,,,https://www.rdkit.org/docs/source/rdkit.Chem.QED.html#rdkit.Chem.QED.qed
 Physicochemical,stereo_centers,Stereo Centers,,regression,#,0,inf,-,,,,,,https://www.rdkit.org/docs/source/rdkit.Chem.rdMolDescriptors.html#rdkit.Chem.rdMolDescriptors.CalcNumAtomStereoCenters
 Physicochemical,tpsa,Topological Polar Surface Area (TPSA),,regression,Å^2,0,inf,-,,,,,,https://www.rdkit.org/docs/source/rdkit.Chem.rdMolDescriptors.html#rdkit.Chem.rdMolDescriptors.CalcTPSA
+Physicochemical,PAINS_alert,PAINS Alert,,regression,#,0,inf,-,,,,,,https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures
+Physicochemical,BRENK_alert,BRENK Alert,,regression,#,0,inf,-,,,,,,https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures
+Physicochemical,NIH_alert,NIH Alert,,regression,#,0,inf,-,,,,,,https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures
 Absorption,HIA_Hou,Human Intestinal Absorption,578,classification,-,0,1,human,2,0.996606708,0.980679753,,,https://tdcommons.ai/single_pred_tasks/adme/#hia-human-intestinal-absorption-hou-et-al
 Absorption,Bioavailability_Ma,Oral Bioavailability,640,classification,-,0,1,human,5,0.898285256,0.783118134,,,https://tdcommons.ai/single_pred_tasks/adme/#bioavailability-ma-et-al
 Absorption,Solubility_AqSolDB,Aqueous Solubility,9982,regression,log(mol/L),-inf,inf,-,1,,,0.814276627,0.673885697,https://tdcommons.ai/single_pred_tasks/adme/#solubility-aqsoldb
