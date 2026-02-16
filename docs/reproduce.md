@@ -8,11 +8,11 @@ This document provides step-by-step instructions for reproducing the ADMET-AI mo
 - [Train Chemprop ADMET predictors](#train-Chemprop-admet-predictors)
 - [Evaluate TDC ADMET Benchmark Group models](#evaluate-tdc-admet-benchmark-group-models)
 - [Get approved drugs from DrugBank](#get-approved-drugs-from-drugbank)
-- [Subsample approved drugs from DrugBank](#subsample-approved-drugs-from-drugbank)
 - [Make predictions on DrugBank approved drugs](#make-predictions-on-drugbank-approved-drugs)
-- [Plot results](#plot-results)
 
 ## Download TDC ADMET data
+
+For the following download commands only, use a Python environment that contains `PyTDC==1.1.15` and `typed-argument-parser`. (Note that PyTDC is incompatible with the other requirements in ADMET-AI.)
 
 Download the [TDC ADMET Benchmark Group](https://tdcommons.ai/benchmark/admet_group/overview/) data (v1.1.15) for evaluating models using scaffold splits in order to compare to the TDC leaderboard.
 
@@ -28,6 +28,22 @@ Download all TDC [ADME](https://tdcommons.ai/single_pred_tasks/adme/) and [Tox](
 python scripts/prepare_tdc_admet_all.py \
     --save_dir data/tdc_admet_all \
     --skip_datasets herg_central hERG_Karim ToxCast
+```
+
+## Filter for valid molecules
+
+Filter all the CSV files to ensure SMILES result in valid RDKit molecules. (Make sure to use the general ADMET-AI Python environment with an up-to-date RDKit.)
+
+```bash
+python scripts/filter_valid_molecules.py \
+    --data_dir data/tdc_admet_group \
+    --smiles_column Drug
+```
+
+```bash
+python scripts/filter_valid_molecules.py \
+    --data_dir data/tdc_admet_all \
+    --smiles_column smiles
 ```
 
 ## Create multitask datasets for regression and classification
