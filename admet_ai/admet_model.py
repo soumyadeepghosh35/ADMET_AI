@@ -41,11 +41,10 @@ class ADMETModel:
         self,
         models_dir: Path | str = DEFAULT_MODELS_DIR,
         include_physchem: bool = True,
-        drugbank_path: Path | str | None = DEFAULT_DRUGBANK_PATH,
+        drugbank_path: Path | None = DEFAULT_DRUGBANK_PATH,
         atc_code: str | None = None,
         num_workers: int | None = None,
         cache_molecules: bool = True,
-        fingerprint_multiprocessing_min: int = 100,
     ) -> None:
         """Initialize the ADMET-AI model.
 
@@ -60,8 +59,6 @@ class ADMETModel:
                             may be faster if not using a GPU, while multiple workers (e.g., 8) are faster with a GPU.
                             If None, defaults to 0 if no GPU is available and 8 if a GPU is available.
         :param cache_molecules: Whether to cache molecules. Caching improves prediction speed but requires more memory.
-        :param fingerprint_multiprocessing_min: Minimum number of molecules for multiprocessing to be used for
-                                                fingerprint computation. Otherwise, single processing is used.
         """
         # Check parameters
         if atc_code is not None and drugbank_path is None:
@@ -75,7 +72,6 @@ class ADMETModel:
         self.include_physchem = include_physchem
         self.num_workers = num_workers
         self.cache_molecules = cache_molecules
-        self.fingerprint_multiprocessing_min = fingerprint_multiprocessing_min
         self._atc_code = atc_code
 
         # Load DrugBank reference set if needed
