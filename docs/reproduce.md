@@ -1,6 +1,6 @@
 # Reproducing TDC ADMET Results
 
-This file contains instructions for reproducing the ADMET-AI data, models, and results. Note: Running the below commands requires the additional TDC dependencies (i.e., `pip install admet_ai[tdc]`).
+This document provides step-by-step instructions for reproducing the ADMET-AI data, models, and results described in our work. Before running the TDC-specific commands below, please ensure you have installed the additional TDC dependencies (i.e., `pip install admet_ai[tdc]`). This may require creating a separate environment just for TDC-related scripts. For full installation instructions, see the [main README](../README.md).
 
 - [Download TDC ADMET data](#download-tdc-admet-data)
 - [Create multitask datasets for regression and classification](#create-multitask-datasets-for-regression-and-classification)
@@ -15,7 +15,7 @@ This file contains instructions for reproducing the ADMET-AI data, models, and r
 
 ## Download TDC ADMET data
 
-Download the [TDC ADMET Benchmark Group](https://tdcommons.ai/benchmark/admet_group/overview/) data (v0.4.1) for evaluating models using scaffold splits in order to compare to the TDC leaderboard.
+Download the [TDC ADMET Benchmark Group](https://tdcommons.ai/benchmark/admet_group/overview/) data (v1.1.15) for evaluating models using scaffold splits in order to compare to the TDC leaderboard.
 
 ```bash
 python scripts/prepare_tdc_admet_group.py \
@@ -122,7 +122,7 @@ python scripts/evaluate_tdc_admet_group.py \
 
 ## Get approved drugs from DrugBank
 
-Get approved drugs from [DrugBank](https://go.drugbank.com/) (v5.1.10) to create a comparison set for Chemprop ADMET predictors. This assumes that the file `drugbank.xml` has been downloaded from DrugBank (license required).
+Get approved drugs from [DrugBank](https://go.drugbank.com/) (v5.1.14) to create a comparison set for Chemprop ADMET predictors. This assumes that the file `drugbank.xml` has been downloaded from DrugBank (license required).
 
 ```bash
 python scripts/get_drugbank_approved.py \

@@ -1,18 +1,15 @@
 """Compute RDKit features for the Therapeutics Data Commons (TDC) ADMET datasets"""
 
-import shutil
-import subprocess
 from pathlib import Path
 from typing import Literal
 
-from chemfunc import compute_fingerprints
+from chemfunc.molecular_fingerprints import compute_fingerprints
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 
-# From ChemFunc
 def save_fingerprints(
     data_path: Path,
     save_path: Path,

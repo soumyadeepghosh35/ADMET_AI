@@ -31,7 +31,6 @@ def prepare_tdc_admet_group(raw_data_dir: Path, save_dir: Path) -> None:
 
     # Create list of dataset stats
     dataset_stats = []
-    all_data = []
 
     # Prepare each dataset
     for data_name in tqdm(data_names):
@@ -63,9 +62,6 @@ def prepare_tdc_admet_group(raw_data_dir: Path, save_dir: Path) -> None:
             combined_data["dataset"] = data_name
             combined_data["seed"] = seed
             combined_data.to_csv(dataset_dir / "data.csv", index=False)
-
-            # Append combined dataset to all_data
-            all_data.append(combined_data)
 
         # Create a single dataset for computing statistics
         data = pd.concat((benchmark["train_val"], benchmark["test"]))
