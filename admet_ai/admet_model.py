@@ -247,12 +247,13 @@ class ADMETModel:
                     devices=1,
                 )
 
-                # Shape of preds: (models x dataloaders x molecules x tasks [ADMET predictions])
-                preds = np.array([trainer.predict(model=model, dataloaders=data_loader) for model in models])
+                # Make predictions (concatenate across batches)
+                preds = torch.stack(
+                    [torch.cat(trainer.predict(model=model, dataloaders=data_loader), dim=0) for model in models]
+                )
 
-                # We perform the mean twice to merge the predictions across models and across data loaders
-                # This works under the assumption that we always have one single data loader and multiple models
-                preds: np.ndarray = np.mean(np.mean(preds, axis=0), axis=0)
+                # Average predictions over models
+                preds = preds.mean(dim=0).numpy()
 
             for i, task in enumerate(tasks):
                 task_to_preds[task] = preds[:, i]

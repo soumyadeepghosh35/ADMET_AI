@@ -37,6 +37,10 @@ def admet_predict(
                         If None, defaults to 0 if no GPU is available and 8 if a GPU is available.
 
     """
+    # Option for no drugbank
+    if str(drugbank_path).lower() == "none":
+        drugbank_path = None
+
     # Load and preprocess data
     data = load_and_preprocess_data(data_path=data_path, smiles_column=smiles_column)
 
