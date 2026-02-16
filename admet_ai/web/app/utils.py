@@ -5,12 +5,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pandas as pd
-from chemprop.data.data import SMILES_TO_MOL
 from flask import request
-from rdkit import Chem
 from werkzeug.utils import secure_filename
-
-from admet_ai.web.app import app
 
 SVG_WIDTH_PATTERN = re.compile(r"width=['\"]\d+(\.\d+)?[a-z]+['\"]")
 SVG_HEIGHT_PATTERN = re.compile(r"height=['\"]\d+(\.\d+)?[a-z]+['\"]")
@@ -29,7 +25,7 @@ def get_smiles_from_request() -> tuple[list[str] | None, str | None]:
     else:
         # Upload data file with SMILES
         data = request.files["data"]
-        data_name = secure_filename(data.filename)
+        data_name = secure_filename(data.filename or "")
         smiles_column = request.form["smiles-column"]
 
         with TemporaryDirectory() as temp_dir:
@@ -49,27 +45,6 @@ def get_smiles_from_request() -> tuple[list[str] | None, str | None]:
     smiles = [smile for smile in smiles if smile != ""]
 
     return smiles, None
-
-
-def smiles_to_mols(smiles: list[str]) -> list[Chem.Mol]:
-    """Convert a list of SMILES to a list of RDKit molecules with caching if turned on.
-
-    :param smiles: A list of SMILES.
-    :return: A list of RDKit molecules.
-    """
-    mols = []
-    for smile in smiles:
-        if smile in SMILES_TO_MOL:
-            mol = SMILES_TO_MOL[smile]
-        else:
-            mol = Chem.MolFromSmiles(smile)
-
-        mols.append(mol)
-
-        if app.config["CACHE_MOLECULES"]:
-            SMILES_TO_MOL[smile] = mol
-
-    return mols
 
 
 def string_to_html_sup(string: str) -> str:

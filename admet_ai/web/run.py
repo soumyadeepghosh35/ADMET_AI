@@ -23,7 +23,6 @@ def setup_web(
     heartbeat_frequency: int = 60,
     max_molecules: int = 1000,
     max_visible_molecules: int = 25,
-    no_cache_molecules: bool = False,
 ) -> None:
     """Sets up the ADMET-AI website.
 
@@ -32,7 +31,6 @@ def setup_web(
     :param heartbeat_frequency: Frequency of client heartbeat in seconds.
     :param max_molecules: Maximum number of molecules to allow predictions for.
     :param max_visible_molecules: Maximum number of molecules to display.
-    :param no_cache_molecules: Whether to turn off molecule caching (reduces memory but slows down predictions).
     """
     # Set up Flask app variables
     app.secret_key = secret_key
@@ -41,7 +39,6 @@ def setup_web(
     app.config["HEARTBEAT_FREQUENCY"] = heartbeat_frequency
     app.config["MAX_MOLECULES"] = max_molecules
     app.config["MAX_VISIBLE_MOLECULES"] = max_visible_molecules
-    app.config["CACHE_MOLECULES"] = not no_cache_molecules
 
     # Load ADMET info, DrugBank, and models into memory
     with app.app_context():

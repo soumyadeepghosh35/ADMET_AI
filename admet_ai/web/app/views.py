@@ -12,6 +12,7 @@ from flask import (
     send_file,
     session,
 )
+from rdkit import Chem
 
 from admet_ai import __version__
 from admet_ai.admet_info import get_admet_info
@@ -37,7 +38,6 @@ from admet_ai.web.app.storage import (
 from admet_ai.web.app.utils import (
     get_smiles_from_request,
     replace_svg_dimensions,
-    smiles_to_mols,
     string_to_html_sup,
 )
 
@@ -97,7 +97,7 @@ def index() -> str:
         )
 
     # Convert SMILES to RDKit molecules
-    mols = smiles_to_mols(all_smiles)
+    mols = [Chem.MolFromSmiles(smiles) for smiles in all_smiles]
 
     # Warn about invalid SMILES
     for smiles, mol in zip(all_smiles, mols):

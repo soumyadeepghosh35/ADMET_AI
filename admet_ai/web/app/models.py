@@ -14,7 +14,6 @@ def load_admet_model() -> None:
         models_dir=app.config["MODELS_DIR"],
         drugbank_path=app.config["DRUGBANK_PATH"],
         num_workers=app.config["NUM_WORKERS"],
-        cache_molecules=app.config["CACHE_MOLECULES"],
     )
 
 

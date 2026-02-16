@@ -44,7 +44,6 @@ class ADMETModel:
         drugbank_path: Path | None = DEFAULT_DRUGBANK_PATH,
         atc_code: str | None = None,
         num_workers: int | None = None,
-        cache_molecules: bool = True,
     ) -> None:
         """Initialize the ADMET-AI model.
 
@@ -58,7 +57,6 @@ class ADMETModel:
         :param num_workers: Number of workers for the data loader. Zero workers (i.e., sequential data loading)
                             may be faster if not using a GPU, while multiple workers (e.g., 8) are faster with a GPU.
                             If None, defaults to 0 if no GPU is available and 8 if a GPU is available.
-        :param cache_molecules: Whether to cache molecules. Caching improves prediction speed but requires more memory.
         """
         # Check parameters
         if atc_code is not None and drugbank_path is None:
@@ -71,7 +69,6 @@ class ADMETModel:
         # Save parameters
         self.include_physchem = include_physchem
         self.num_workers = num_workers
-        self.cache_molecules = cache_molecules
         self._atc_code = atc_code
 
         # Load DrugBank reference set if needed
