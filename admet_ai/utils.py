@@ -36,6 +36,7 @@ def get_drugbank_suffix(atc_code: str | None) -> str:
     """Gets the DrugBank percentile suffix for the given ATC code.
 
     :param atc_code: The ATC code.
+    :return: The column suffix for DrugBank percentiles (e.g., "drugbank_approved_percentile" or "drugbank_approved_{atc_code}_percentile").
     """
     if atc_code is None:
         return "drugbank_approved_percentile"

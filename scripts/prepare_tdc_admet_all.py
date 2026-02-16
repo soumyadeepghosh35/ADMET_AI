@@ -58,7 +58,7 @@ DATASET_TO_LABEL_NAMES = {
 }
 
 
-def prepare_tdc_admet_all(save_dir: Path, skip_datasets: list[str] = None) -> None:
+def prepare_tdc_admet_all(save_dir: Path, skip_datasets: list[str] | None = None) -> None:
     """Download and prepare all the Therapeutics Data Commons (TDC) ADMET datasets.
 
     :param save_dir: A directory where the TDC AMDET data will be saved.

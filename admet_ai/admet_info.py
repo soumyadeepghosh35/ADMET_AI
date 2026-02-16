@@ -1,10 +1,13 @@
 """Defines functions for ADMET info."""
 
 from pathlib import Path
+from typing import Callable, TypeVar, cast
 
 import pandas as pd
 
 from admet_ai.constants import DEFAULT_ADMET_PATH
+
+F = TypeVar("F", bound=Callable[..., object])
 
 ADMET_DF = pd.DataFrame()
 ADMET_ID_TO_NAME: dict[str, str] = {}
@@ -28,8 +31,12 @@ def load_admet_info(admet_path: Path = DEFAULT_ADMET_PATH) -> None:
     ADMET_ID_TO_UNITS = dict(zip(ADMET_DF["id"], ADMET_DF["units"]))
 
 
-def lazy_load_admet_info(func: callable) -> callable:
-    """Decorator to lazily load the ADMET info."""
+def lazy_load_admet_info(func: F) -> F:
+    """Decorator to lazily load the ADMET info.
+
+    :param func: The function to wrap. Must be one of the ADMET info getters.
+    :return: The wrapped function.
+    """
 
     def wrapper(*args, **kwargs):
         if ADMET_DF.empty:
@@ -37,7 +44,7 @@ def lazy_load_admet_info(func: callable) -> callable:
 
         return func(*args, **kwargs)
 
-    return wrapper
+    return cast(F, wrapper)
 
 
 @lazy_load_admet_info

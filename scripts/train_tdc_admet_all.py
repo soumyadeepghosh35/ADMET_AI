@@ -24,7 +24,7 @@ def train_tdc_admet_all(
     :param data_dir: A directory containing all the downloaded and prepared TDC ADMET data.
     :param save_dir: A directory where the models will be saved.
     :param model_type: The type of model to train (Chemprop or Chemprop-RDKit).
-    :param num_folds: The number of folds to use for cross-validation.
+    :param num_replicates: The number of replicates to train per dataset.
     """
     # Get dataset paths
     data_paths = sorted(data_dir.glob("*.csv"))

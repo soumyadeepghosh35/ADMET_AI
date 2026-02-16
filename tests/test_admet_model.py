@@ -4,12 +4,12 @@ from pytest_check import check
 
 
 @pytest.fixture
-def model():
+def model() -> ADMETModel:
     """Fixture to initialize the ADMET model."""
     return ADMETModel()
 
 
-def test_admet_model_prediction_consistency(model):
+def test_admet_model_prediction_consistency(model: ADMETModel) -> None:
     """Test that predictions for a specific SMILES string remain consistent."""
 
     # Known SMILES string

@@ -50,7 +50,7 @@ def read_drugbank_data(drugbank_path: Path) -> pd.DataFrame:
     return drugbank
 
 
-def create_atc_code_mapping(drugbank: pd.DataFrame) -> dict:
+def create_atc_code_mapping(drugbank: pd.DataFrame) -> dict[str, list[int]]:
     """Map ATC codes to drugbank indices.
 
     :param drugbank: A DataFrame containing the DrugBank data.
