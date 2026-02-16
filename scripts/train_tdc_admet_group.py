@@ -47,8 +47,6 @@ def train_tdc_admet_all(data_dir: Path, save_dir: Path, model_type: Literal["che
                 *DATASET_TYPE_TO_METRICS_COMMAND_LINE[dataset_type],
                 "--save-dir",
                 save_dir / model_type / data_name / str(seed),
-                "--checkpoint",
-                save_dir / model_type / data_name / str(seed),
             ]
 
             if model_type == "chemprop_rdkit":
