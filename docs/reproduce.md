@@ -1,12 +1,11 @@
-# Reproducing TDC ADMET Results
+# Reproducing ADMET-AI Models
 
-This document provides step-by-step instructions for reproducing the ADMET-AI data, models, and results described in our work. Before running the TDC-specific commands below, please ensure you have installed the additional TDC dependencies (i.e., `pip install admet_ai[tdc]`). This may require creating a separate environment just for TDC-related scripts. For full installation instructions, see the [main README](../README.md).
+This document provides step-by-step instructions for reproducing the ADMET-AI models in the current release. To reproduce the data, models, and results from [our paper](https://academic.oup.com/bioinformatics/article/40/7/btae416/7698030), please check out a commit from ADMET-AI v1 (e.g., v1.4.0 [here](https://github.com/swansonk14/admet_ai/releases/tag/v_1.4.0)) and follow those instructions.
 
 - [Download TDC ADMET data](#download-tdc-admet-data)
 - [Create multitask datasets for regression and classification](#create-multitask-datasets-for-regression-and-classification)
 - [Create a single dataset with all TDC ADMET data](#create-a-single-dataset-with-all-tdc-admet-data)
-- [Compute RDKit features](#compute-rdkit-features)
-- [Train Chemprop-RDKit ADMET predictors](#train-chemprop-rdkit-admet-predictors)
+- [Train Chemprop ADMET predictors](#train-Chemprop-admet-predictors)
 - [Evaluate TDC ADMET Benchmark Group models](#evaluate-tdc-admet-benchmark-group-models)
 - [Get approved drugs from DrugBank](#get-approved-drugs-from-drugbank)
 - [Subsample approved drugs from DrugBank](#subsample-approved-drugs-from-drugbank)
@@ -51,73 +50,45 @@ python scripts/merge_tdc_admet_all.py \
     --save_path data/tdc_admet_all.csv
 ```
 
-## Compute RDKit features
+## Train Chemprop ADMET predictors
 
-Compute RDKit features in order to train Chemprop-RDKit models (i.e., Chemprop models augmented with 200 molecular features from RDKit).
+Train Chemprop predictors on the ADMET data. Note: A GPU is used by default if available.
 
-Compute RDKit features for the TDC ADMET Benchmark Group data.
-
-```bash
-python scripts/compute_rdkit_features.py \
-    --data_dir data/tdc_admet_group \
-    --smiles_column Drug
-```
-
-Compute RDKit features for all TDC ADMET datasets.
-
-```bash
-python scripts/compute_rdkit_features.py \
-    --data_dir data/tdc_admet_all \
-    --smiles_column smiles
-```
-
-Compute RDKit features for TDC ADMET multitask datasets.
-
-```bash
-python scripts/compute_rdkit_features.py \
-    --data_dir data/tdc_admet_all_multitask \
-    --smiles_column smiles
-```
-
-## Train Chemprop-RDKit ADMET predictors
-
-Train Chemprop-RDKit predictors on the ADMET data. Note: A GPU is used by default if available.
-
-Train Chemprop-RDKit ADMET predictors on the TDC ADMET Benchmark Group data.
+Train Chemprop ADMET predictors on the TDC ADMET Benchmark Group data.
 
 ```bash
 python scripts/train_tdc_admet_group.py \
     --data_dir data/tdc_admet_group \
     --save_dir models/tdc_admet_group \
-    --model_type chemprop_rdkit
+    --model_type chemprop
 ```
 
-Train Chemprop-RDKit ADMET predictors on all TDC ADMET datasets.
+Train Chemprop ADMET predictors on all TDC ADMET datasets.
 
 ```bash
 python scripts/train_tdc_admet_all.py \
     --data_dir data/tdc_admet_all \
     --save_dir models/tdc_admet_all \
-    --model_type chemprop_rdkit
+    --model_type chemprop
 ```
 
-Train Chemprop-RDKit ADMET predictors on the TDC ADMET multitask datasets.
+Train Chemprop ADMET predictors on the TDC ADMET multitask datasets.
 
 ```bash
 python scripts/train_tdc_admet_all.py \
     --data_dir data/tdc_admet_all_multitask \
     --save_dir models/tdc_admet_all_multitask \
-    --model_type chemprop_rdkit
+    --model_type chemprop
 ```
 
 ## Evaluate TDC ADMET Benchmark Group models
 
-Evaluate Chemprop-RDKit ADMET predictors trained on the TDC ADMET Benchmark Group data.
+Evaluate Chemprop ADMET predictors trained on the TDC ADMET Benchmark Group data.
 
 ```bash
 python scripts/evaluate_tdc_admet_group.py \
     --data_dir data/tdc_admet_group_raw \
-    --preds_dir models/tdc_admet_group/chemprop_rdkit
+    --preds_dir models/tdc_admet_group/chemprop
 ```
 
 ## Get approved drugs from DrugBank
@@ -132,91 +103,12 @@ python scripts/get_drugbank_approved.py \
 
 ## Make predictions on DrugBank approved drugs
 
-Make ADMET predictions on DrugBank approved drugs using Chemprop-RDKit multitask predictor (and compute physicochemical properties).
+Make ADMET predictions on DrugBank approved drugs using Chemprop multitask predictor (and compute physicochemical properties).
 
 ```bash
 admet_predict \
     --data_path data/drugbank/drugbank_approved.csv \
     --save_path data/drugbank/drugbank_approved_physchem_admet.csv \
-    --models_dir models/tdc_admet_all_multitask/chemprop_rdkit \
+    --models_dir models/tdc_admet_all_multitask/chemprop \
     --smiles_column smiles
-```
-
-## Subsample approved drugs from DrugBank
-
-Subsample approved drugs from DrugBank for measuring ADMET prediction speed. Limit SMILES length to 200 for compatibility with SwissADME.
-
-```bash
-for NUM_MOLECULES in 1 10 100
-do
-python scripts/sample_molecules.py \
-    --data_path data/drugbank/drugbank_approved.csv \
-    --num_molecules ${NUM_MOLECULES} \
-    --max_smiles_length 200 \
-    --save_path data/drugbank/drugbank_approved_${NUM_MOLECULES}.csv
-done
-```
-
-Due to compatibility issues with ADMETlab2.0, four compounds in `drugbank_approved_100.csv` were replaced with other randomly sampled compounds from DrugBank. The replacements are as follows.
-
-Helium ==> Cabazitaxel
-
-Chromic nitrate ==> Butorphanol
-
-Perboric acid ==> Methazolamide
-
-Fluoride ion F-18 ==> Tetracaine
-
-Then, `drugbank_approved_1000.csv` was constructed by repeating `drugbank_approved_100.csv` ten times (in order to maintain compatibility with ADMETlab2.0). Similarly, `drugbank_approved_1M.csv` was constructed by repeating `drugbank_approved_1000.csv` 1000 times.
-
-
-## Time local ADMET-AI predictions
-
-Time local ADMET-AI predictions on DrugBank approved drugs. Run this command on an 8-core machine with and without a GPU.
-
-```bash
-for NUM_MOLECULES in 1 10 100 1000 1M
-do
-for ITER in 1 2 3
-do
-echo "Timing ADMET-AI on ${NUM_MOLECULES} molecules, iteration ${ITER}"
-time admet_predict \
-    --data_path data/drugbank/drugbank_approved_${NUM_MOLECULES}.csv \
-    --save_path data/drugbank/drugbank_approved_${NUM_MOLECULES}_admet_${ITER}.csv \
-    --models_dir models/tdc_admet_all_multitask/chemprop_rdkit \
-    --smiles_column smiles
-done
-done
-```
-
-## Plot results
-
-Plot TDC ADMET results. First, download the results from [here](https://docs.google.com/spreadsheets/d/1bh9FEHqhbfHKF-Nxjad0Cpy2p5ztH__p0pijB43yc94/edit?usp=sharing) and save them to `results/TDC ADMET Results.xlsx`. Then, run the following command.
-
-```bash
-python scripts/plot_tdc_results.py \
-    --results_path results/TDC\ ADMET\ Results.xlsx \
-    --save_dir plots/tdc_results
-```
-
-Plot DrugBank statistics.
-
-```bash
-python scripts/plot_drugbank_approved.py \
-    --data_path data/drugbank/drugbank_approved.csv \
-    --save_dir plots/drugbank_approved
-```
-
-Plot ADMET website speed. First, download the results from [here](https://docs.google.com/spreadsheets/d/1_bvDO73MvYb7wl7_kH6Vagonyi-EJ6H-u8KpwQQ9Srg/edit?usp=sharing) and save them to `results/ADMET Tools Comparison.xlsx`. Then, run the following command.
-
-```bash
-python scripts/plot_admet_speed.py \
-    --results_path results/ADMET\ Speed\ Comparison.xlsx \
-    --save_path plots/admet_speed.pdf
-```
-
-```bash
-python scripts/plot_admet_speed_large_scale.py \
-    --results_path results/ADMET\ Speed\ Comparison.xlsx \
-    --save_path plots/admet_speed_large_scale.pdf
 ```

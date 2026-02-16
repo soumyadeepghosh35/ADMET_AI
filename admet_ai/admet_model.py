@@ -30,7 +30,7 @@ from admet_ai.drugbank import (
     filter_drugbank_by_atc,
     read_drugbank_data,
 )
-from admet_ai.physchem import compute_fingerprints, compute_physicochemical_properties
+from admet_ai.physchem import compute_physicochemical_properties
 from admet_ai.utils import get_drugbank_suffix
 
 
@@ -89,14 +89,10 @@ class ADMETModel:
 
         # Prepare lists to contain model details
         self.task_lists: list[list[str]] = []
-        self.use_features_list: list[bool] = []
         self.model_lists: list[list[MPNN]] = []
         self.scaler_lists: list[list[StandardScaler | None]] = []
 
         self._load_model_ensembles(models_dir)
-
-        # TODO: This is currently assuming we should always use our own fingerprints
-        self.use_features = True
 
     def _load_drugbank_data(
         self, drugbank_path: Path | None, atc_code: str | None
@@ -180,11 +176,7 @@ class ADMETModel:
         # Compute physicochemical properties
         physchem_preds = compute_physicochemical_properties(all_smiles=smiles, mols=mols)
 
-        fingerprints = compute_fingerprints(
-            mols=mols, use_features=self.use_features, min_parallel=self.fingerprint_multiprocessing_min
-        )
-
-        data_loader = self._build_dataloader(mols=mols, fingerprints=fingerprints)
+        data_loader = self._build_dataloader(mols=mols)
 
         task_to_preds = self._make_ensemble_predictions(data_loader=data_loader)
 
@@ -228,14 +220,13 @@ class ADMETModel:
 
         return mols, filtered_smiles
 
-    def _build_dataloader(self, mols: list[Chem.Mol], fingerprints: np.ndarray) -> DataLoader:
+    def _build_dataloader(self, mols: list[Chem.Mol]) -> DataLoader:
         """Create a DataLoader for model predictions.
 
         :param mols: A list of RDKit molecules.
-        :param fingerprints: A numpy array of fingerprints.
         :return: A DataLoader.
         """
-        data_points = [MoleculeDatapoint(mol=mol, x_d=fingerprint) for mol, fingerprint in zip(mols, fingerprints)]
+        data_points = [MoleculeDatapoint(mol=mol) for mol in mols]
         dataset = MoleculeDataset(data=data_points)
         return build_dataloader(dataset=dataset, num_workers=self.num_workers, shuffle=False)
 

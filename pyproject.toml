@@ -33,7 +33,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "chemfunc>=1.0.12",
     "chemprop==2.2.2",
     "lightning",
     "numpy",
