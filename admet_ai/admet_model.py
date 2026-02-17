@@ -251,7 +251,8 @@ class ADMETModel:
         ):
             with torch.inference_mode():
                 trainer = pl.Trainer(
-                    logger=None,
+                    logger=False,
+                    enable_checkpointing=False,
                     enable_progress_bar=True,
                     accelerator=self.device,
                     devices=1,
