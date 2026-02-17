@@ -14,6 +14,12 @@ from admet_ai.constants import DEFAULT_ADMET_PATH, DEFAULT_DRUGBANK_PATH
 RTOL = 1e-3
 ATOL = 1e-4
 
+# Percentiles are computed by scipy.stats.percentileofscore (rank-based). They are a *step function*
+# of the prediction: a tiny change in the prediction can cross reference values and jump the
+# percentile. So we use looser tolerances for percentile columns to avoid flaky CI across OS/Python.
+PERCENTILE_RTOL = 0.01  # 1% relative
+PERCENTILE_ATOL = 1.0  # 1 percentile point
+
 
 ADMET_DATA = pd.read_csv(DEFAULT_ADMET_PATH)
 DRUGBANK_DATA = pd.read_csv(DEFAULT_DRUGBANK_PATH)
@@ -26,6 +32,15 @@ DRUGBANK_DATA_PERCENTILES = pd.read_csv(TEST_DATA_DIR / "drugbank_approved_perce
 DRUGBANK_DATA_PERCENTILES_NERVOUS_SYSTEM = pd.read_csv(
     TEST_DATA_DIR / "drugbank_approved_percentiles_nervous_system.csv.bz2"
 )
+
+
+def _is_percentile_column(column: str) -> bool:
+    """True if the column holds DrugBank percentile values.
+
+    :param column: The column name.
+    :return: True if the column holds DrugBank percentile values.
+    """
+    return column.endswith("_percentile")
 
 
 class TestADMETPredict:
@@ -54,12 +69,9 @@ class TestADMETPredict:
             assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
-                all_close = np.allclose(preds[column].values, FIRST_DRUGBANK_ROW[column], rtol=RTOL, atol=ATOL)
-
-                if not all_close:
-                    print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - FIRST_DRUGBANK_ROW[column]))}")
-
-                assert all_close, f"Column {column} does not match"
+                assert np.allclose(
+                    preds[column].values, FIRST_DRUGBANK_ROW[column], rtol=RTOL, atol=ATOL
+                ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -87,14 +99,9 @@ class TestADMETPredict:
             assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
-                all_close = np.allclose(preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL)
-
-                if not all_close:
-                    print(
-                        f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - DRUGBANK_DATA[column].values))}"
-                    )
-
-                assert all_close, f"Column {column} does not match"
+                assert np.allclose(
+                    preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
+                ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_predict_drugbank_with_percentiles(self, atc_code: str | None) -> None:
@@ -123,14 +130,12 @@ class TestADMETPredict:
             assert len(preds.columns) == 2 * len(ADMET_DATA)
 
             for column in preds.columns:
-                all_close = np.allclose(preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL)
+                rtol = PERCENTILE_RTOL if _is_percentile_column(column) else RTOL
+                atol = PERCENTILE_ATOL if _is_percentile_column(column) else ATOL
 
-                if not all_close:
-                    print(
-                        f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - reference_data[column].values))}"
-                    )
-
-                assert all_close, f"Column {column} does not match"
+                assert np.allclose(
+                    preds[column].values, reference_data[column].values, rtol=rtol, atol=atol
+                ), f"Column {column} does not match"
 
 
 class TestADMETModel:
@@ -151,12 +156,9 @@ class TestADMETModel:
         assert len(preds) == len(expected)
 
         for key in preds.keys():
-            all_close = np.allclose(preds[key], FIRST_DRUGBANK_ROW[key], rtol=RTOL, atol=ATOL)
-
-            if not all_close:
-                print(f"MAX DIFF for {key}: {np.max(np.abs(preds[key] - FIRST_DRUGBANK_ROW[key]))}")
-
-            assert all_close, f"{key} prediction does not match"
+            assert np.allclose(
+                preds[key], FIRST_DRUGBANK_ROW[key], rtol=RTOL, atol=ATOL
+            ), f"{key} prediction does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -175,12 +177,9 @@ class TestADMETModel:
         assert len(preds.columns) == len(expected)
 
         for column in preds.columns:
-            all_close = np.allclose(preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL)
-
-            if not all_close:
-                print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - DRUGBANK_DATA[column].values))}")
-
-            assert all_close, f"Column {column} does not match"
+            assert np.allclose(
+                preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
+            ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_model_drugbank_with_percentiles(self, atc_code: str | None) -> None:
@@ -200,9 +199,9 @@ class TestADMETModel:
         assert len(preds.columns) == 2 * len(ADMET_DATA)
 
         for column in preds.columns:
-            all_close = np.allclose(preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL)
+            rtol = PERCENTILE_RTOL if _is_percentile_column(column) else RTOL
+            atol = PERCENTILE_ATOL if _is_percentile_column(column) else ATOL
 
-            if not all_close:
-                print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - reference_data[column].values))}")
-
-            assert all_close, f"Column {column} does not match"
+            assert np.allclose(
+                preds[column].values, reference_data[column].values, rtol=rtol, atol=atol
+            ), f"Column {column} does not match"
