@@ -19,7 +19,8 @@ FIRST_DRUGBANK_SMILES = FIRST_DRUGBANK_ROW["smiles"]
 
 
 class TestADMETPredict:
-    def test_admet_predict_single_smiles(self) -> None:
+    @pytest.mark.parametrize("include_physchem", [True, False])
+    def test_admet_predict_single_smiles(self, include_physchem: bool) -> None:
         """Test admet_predict with the first DrugBank SMILES."""
         with TemporaryDirectory() as temp_dir:
             data_path = Path(temp_dir) / "data.csv"
@@ -30,16 +31,17 @@ class TestADMETPredict:
             admet_predict(
                 data_path=data_path,
                 save_path=preds_path,
-                include_physchem=True,
+                include_physchem=include_physchem,
                 drugbank_path=None,
                 atc_code=None,
-                num_workers=0,
             )
 
             preds = pd.read_csv(preds_path).set_index("smiles")
 
+            expected = ADMET_DATA if include_physchem else ADMET_DATA[ADMET_DATA["category"] != "Physicochemical"]
+
             assert len(preds) == 1
-            assert len(preds.columns) == len(ADMET_DATA)
+            assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
                 assert np.allclose(preds[column].values, FIRST_DRUGBANK_ROW[column]), f"Column {column} does not match"
@@ -77,19 +79,21 @@ class TestADMETPredict:
 
 
 class TestADMETModel:
-    def test_admet_model_single_smiles(self) -> None:
+    @pytest.mark.parametrize("include_physchem", [True, False])
+    def test_admet_model_single_smiles(self, include_physchem: bool) -> None:
         """Test ADMETModel.predict with the first DrugBank SMILES."""
         model = ADMETModel(
-            include_physchem=True,
+            include_physchem=include_physchem,
             drugbank_path=None,
             atc_code=None,
-            num_workers=0,
         )
 
         preds = model.predict(smiles=FIRST_DRUGBANK_SMILES)
 
+        expected = ADMET_DATA if include_physchem else ADMET_DATA[ADMET_DATA["category"] != "Physicochemical"]
+
         assert isinstance(preds, dict)
-        assert len(preds) == len(ADMET_DATA)
+        assert len(preds) == len(expected)
 
         for key in preds.keys():
             assert np.allclose(preds[key], FIRST_DRUGBANK_ROW[key]), f"{key} prediction does not match"
