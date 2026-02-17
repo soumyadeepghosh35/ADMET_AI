@@ -54,9 +54,12 @@ class TestADMETPredict:
             assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
-                assert np.allclose(
-                    preds[column].values, FIRST_DRUGBANK_ROW[column], rtol=RTOL, atol=ATOL
-                ), f"Column {column} does not match"
+                all_close = np.allclose(preds[column].values, FIRST_DRUGBANK_ROW[column], rtol=RTOL, atol=ATOL)
+
+                if not all_close:
+                    print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - FIRST_DRUGBANK_ROW[column]))}")
+
+                assert all_close, f"Column {column} does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -84,9 +87,14 @@ class TestADMETPredict:
             assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
-                assert np.allclose(
-                    preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
-                ), f"Column {column} does not match"
+                all_close = np.allclose(preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL)
+
+                if not all_close:
+                    print(
+                        f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - DRUGBANK_DATA[column].values))}"
+                    )
+
+                assert all_close, f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_predict_drugbank_with_percentiles(self, atc_code: str | None) -> None:
@@ -115,9 +123,14 @@ class TestADMETPredict:
             assert len(preds.columns) == 2 * len(ADMET_DATA)
 
             for column in preds.columns:
-                assert np.allclose(
-                    preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL
-                ), f"Column {column} does not match"
+                all_close = np.allclose(preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL)
+
+                if not all_close:
+                    print(
+                        f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - reference_data[column].values))}"
+                    )
+
+                assert all_close, f"Column {column} does not match"
 
 
 class TestADMETModel:
@@ -138,9 +151,12 @@ class TestADMETModel:
         assert len(preds) == len(expected)
 
         for key in preds.keys():
-            assert np.allclose(
-                preds[key], FIRST_DRUGBANK_ROW[key], rtol=RTOL, atol=ATOL
-            ), f"{key} prediction does not match"
+            all_close = np.allclose(preds[key], FIRST_DRUGBANK_ROW[key], rtol=RTOL, atol=ATOL)
+
+            if not all_close:
+                print(f"MAX DIFF for {key}: {np.max(np.abs(preds[key] - FIRST_DRUGBANK_ROW[key]))}")
+
+            assert all_close, f"{key} prediction does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -159,9 +175,12 @@ class TestADMETModel:
         assert len(preds.columns) == len(expected)
 
         for column in preds.columns:
-            assert np.allclose(
-                preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
-            ), f"Column {column} does not match"
+            all_close = np.allclose(preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL)
+
+            if not all_close:
+                print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - DRUGBANK_DATA[column].values))}")
+
+            assert all_close, f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_model_drugbank_with_percentiles(self, atc_code: str | None) -> None:
@@ -181,6 +200,9 @@ class TestADMETModel:
         assert len(preds.columns) == 2 * len(ADMET_DATA)
 
         for column in preds.columns:
-            assert np.allclose(
-                preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL
-            ), f"Column {column} does not match"
+            all_close = np.allclose(preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL)
+
+            if not all_close:
+                print(f"MAX DIFF for {column}: {np.max(np.abs(preds[column].values - reference_data[column].values))}")
+
+            assert all_close, f"Column {column} does not match"
