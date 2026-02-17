@@ -17,6 +17,10 @@ DRUGBANK_DATA = pd.read_csv(DEFAULT_DRUGBANK_PATH)
 FIRST_DRUGBANK_ROW = DRUGBANK_DATA.iloc[0]
 FIRST_DRUGBANK_SMILES = FIRST_DRUGBANK_ROW["smiles"]
 
+TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
+DRUGBANK_DATA_PERCENTILES = pd.read_csv(TEST_DATA_DIR / "drugbank_approved_percentiles.csv.bz2")
+DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS = pd.read_csv(TEST_DATA_DIR / "drugbank_approved_percentiles_antibiotics.csv.bz2")
+
 
 class TestADMETPredict:
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -46,8 +50,7 @@ class TestADMETPredict:
             for column in preds.columns:
                 assert np.allclose(preds[column].values, FIRST_DRUGBANK_ROW[column]), f"Column {column} does not match"
 
-    # TODO: move workers
-    @pytest.mark.parametrize("num_workers", [0])
+    @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
     def test_admet_predict_drugbank(self, num_workers: int, include_physchem: bool) -> None:
         """Test predictions on DrugBank data using admet_predict."""
@@ -77,19 +80,26 @@ class TestADMETPredict:
                     preds[column].values, DRUGBANK_DATA[column].values
                 ), f"Column {column} does not match"
 
-    def test_admet_predict_drugbank_with_reference(self) -> None:
+    @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
+    def test_admet_predict_drugbank_with_reference(self, atc_code: str | None) -> None:
         """Test admet_predict on DrugBank data with DrugBank percentiles."""
+        if atc_code is None:
+            reference_data = DRUGBANK_DATA_PERCENTILES
+        else:
+            reference_data = DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS
+
         with TemporaryDirectory() as temp_dir:
             data_path = Path(temp_dir) / "data.csv"
             preds_path = Path(temp_dir) / "preds.csv"
 
-            drugbank_smiles = DRUGBANK_DATA[["smiles"]]
+            drugbank_smiles = reference_data[["smiles"]]
             drugbank_smiles.to_csv(data_path, index=False)
 
             admet_predict(
                 data_path=data_path,
                 save_path=preds_path,
                 include_physchem=True,
+                atc_code=atc_code,
             )
 
             preds = pd.read_csv(preds_path).set_index("smiles")
@@ -97,17 +107,9 @@ class TestADMETPredict:
             assert len(preds.columns) == 2 * len(ADMET_DATA)
 
             for column in preds.columns:
-                if column.endswith("_percentile"):
-                    min_value = preds[column].values.min()
-                    max_value = preds[column].values.max()
-
-                    assert np.allclose(min(min_value, 0), 0) and np.allclose(
-                        max(max_value, 100), 100
-                    ), f"{column} percentile is not between 0 and 100"
-                else:
-                    assert np.allclose(
-                        preds[column].values, DRUGBANK_DATA[column].values
-                    ), f"Column {column} does not match"
+                assert np.allclose(
+                    preds[column].values, reference_data[column].values
+                ), f"Column {column} does not match"
 
 
 class TestADMETModel:
@@ -130,8 +132,7 @@ class TestADMETModel:
         for key in preds.keys():
             assert np.allclose(preds[key], FIRST_DRUGBANK_ROW[key]), f"{key} prediction does not match"
 
-    # TODO: more workers
-    @pytest.mark.parametrize("num_workers", [0])
+    @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
     def test_admet_model_drugbank(self, num_workers: int, include_physchem: bool) -> None:
         """Test predictions on DrugBank data using ADMETModel."""
@@ -150,25 +151,22 @@ class TestADMETModel:
         for column in preds.columns:
             assert np.allclose(preds[column].values, DRUGBANK_DATA[column].values), f"Column {column} does not match"
 
-    def test_admet_model_drugbank_with_reference(self) -> None:
+    @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
+    def test_admet_model_drugbank_with_reference(self, atc_code: str | None) -> None:
         """Test ADMETModel on DrugBank data with DrugBank percentiles."""
         model = ADMETModel(
             include_physchem=True,
+            atc_code=atc_code,
         )
 
-        preds = model.predict(smiles=DRUGBANK_DATA["smiles"].tolist())
+        if atc_code is None:
+            reference_data = DRUGBANK_DATA_PERCENTILES
+        else:
+            reference_data = DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS
+
+        preds = model.predict(smiles=reference_data["smiles"].tolist())
 
         assert len(preds.columns) == 2 * len(ADMET_DATA)
 
         for column in preds.columns:
-            if column.endswith("_percentile"):
-                min_value = preds[column].values.min()
-                max_value = preds[column].values.max()
-
-                assert np.allclose(min(min_value, 0), 0) and np.allclose(
-                    max(max_value, 100), 100
-                ), f"{column} percentile is not between 0 and 100"
-            else:
-                assert np.allclose(
-                    preds[column].values, DRUGBANK_DATA[column].values
-                ), f"Column {column} does not match"
+            assert np.allclose(preds[column].values, reference_data[column].values), f"Column {column} does not match"

@@ -75,10 +75,10 @@ radial_description_tooltip %}
         </p>
         <p>
             <strong><u>Models:</u></strong> ADMET-AI predicts ADMET properties using a graph neural network architecture
-            called <strong>Chemprop-RDKit</strong> (see the <a href="https://github.com/chemprop/chemprop">Chemprop</a>
-            package for details). ADMET-AI's Chemprop-RDKit models were trained on 41 ADMET datasets from
+            called <strong>Chemprop</strong> (see the <a href="https://github.com/chemprop/chemprop">Chemprop</a>
+            package for details). ADMET-AI's Chemprop models were trained on 41 ADMET datasets from
             the <a href="https://tdcommons.ai/" target="_blank">Therapeutics Data Commons (TDC)</a>.
-            ADMET-AI’s Chemprop-RDKit models have the <strong>highest average rank</strong> on the
+            ADMET-AI's Chemprop models have the <strong>highest average rank</strong> on the
             <a href="https://tdcommons.ai/benchmark/admet_group/overview/" target="_blank">TDC ADMET Benchmark Group
                 leaderboard</a>. ADMET-AI is also currently the fastest web-based ADMET predictor.
         </p>
@@ -132,14 +132,14 @@ radial_description_tooltip %}
         </p>
         {{ radial_description_list() }}
         <p>
-            <strong><u>ADMET Predictions:</u></strong> Clicking on each displayed molecule will show the molecule’s
+            <strong><u>ADMET Predictions:</u></strong> Clicking on each displayed molecule will show the molecule's
             ADMET predictions in tabular form. For each molecule, ADMET-AI computes 8 physicochemical properties
             using <a href="https://www.rdkit.org/docs/index.html" target="_blank">RDKit</a> and predicts 41 ADMET
-            properties using its Chemprop-RDKit graph neural networks.
+            properties using its Chemprop graph neural networks.
             For regression properties, the property is directly predicted with the units shown. For
             classification properties, the predicted value is the probability that the molecule has the
             property (e.g., probability of blood-brain barrier penetration).
-            Additionally, the percentile of the molecule’s property compared to the DrugBank reference is shown. Note:
+            Additionally, the percentile of the molecule's property compared to the DrugBank reference is shown. Note:
             For regression properties, the displayed value is clipped to a valid range (e.g., &#8805;0 for half life)
             while the downloaded results contain the original value.
         </p>
@@ -387,7 +387,7 @@ radial_description_tooltip %}
                                 {% set value_name = "value" if category == "Physicochemical" else "prediction" %}
                                 <th data-toggle="tooltip" title="The {{ category.lower() }} property.">Property</th>
                                 <th data-toggle="tooltip"
-                                    title="{{ 'Value computed by RDKit.' if category == 'Physicochemical' else 'Prediction by ADMET-AI\'s Chemprop-RDKit graph neural network.' }}">
+                                    title="{{ 'Value computed by RDKit.' if category == 'Physicochemical' else 'Prediction by ADMET-AI\'s Chemprop graph neural network.' }}">
                                     {{ "Value" if category == "Physicochemical" else "Prediction" }}
                                 </th>
                                 <th data-toggle="tooltip"

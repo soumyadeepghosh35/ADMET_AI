@@ -1,4 +1,4 @@
-"""Make predictions on a dataset using Chemprop-RDKit models trained on TDC ADMET data."""
+"""Make predictions on a dataset using Chemprop models trained on TDC ADMET data."""
 
 from pathlib import Path
 
@@ -20,11 +20,11 @@ def admet_predict(
     smiles_column: str = "smiles",
     num_workers: int | None = None,
 ) -> None:
-    """Make predictions on a dataset using Chemprop-RDKit models trained on TDC ADMET data.
+    """Make predictions on a dataset using Chemprop models trained on TDC ADMET data.
 
     :param data_path: Path to a CSV file containing a dataset of molecules.
     :param models_dir: Path to a directory containing subdirectories, each of which contains an ensemble
-                       of Chemprop-RDKit models.
+                       of Chemprop models.
     :param save_path: Path to a CSV file where predictions will be saved. If None, defaults to data_path.
     :param include_physchem: Whether to include physicochemical properties in the predictions.
     :param drugbank_path: Path to a CSV file containing DrugBank approved molecules

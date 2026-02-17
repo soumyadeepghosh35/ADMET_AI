@@ -48,7 +48,7 @@ class ADMETModel:
         """Initialize the ADMET-AI model.
 
         :param models_dir: Path to a directory containing subdirectories, each of which contains an ensemble
-                           of Chemprop-RDKit models.
+                           of Chemprop models.
         :param include_physchem: Whether to include physicochemical properties in the predictions.
         :param drugbank_path: Path to a CSV file containing DrugBank approved molecules
                               with ADMET predictions and ATC codes.
