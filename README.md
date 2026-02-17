@@ -12,9 +12,13 @@ command line, via the Python API, or via a web server. A live web server hosting
 at [admet.ai.greenstonebio.com](https://admet.ai.greenstonebio.com)
 
 Please see the following paper and [this blog post](https://portal.valencelabs.com/blogs/post/admet-ai-a-machine-learning-admet-platform-for-evaluation-of-large-scale-QPEa0j5OTYYHTaA) for more
-details, and please cite us if ADMET-AI is useful in your work. Instructions to reproduce the results in our paper are in [docs/reproduce.md](docs/reproduce.md).
+details, and please cite us if ADMET-AI is useful in your work.
 
 [ADMET-AI: A machine learning ADMET platform for evaluation of large-scale chemical libraries](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btae416/7698030?utm_source=authortollfreelink&utm_campaign=bioinformatics&utm_medium=email&guestAccessKey=f4fca1d2-49ec-4b10-b476-5aea3bf37045)
+
+## Versions
+
+This repo contains ADMET-AI v2, whereas our [paper](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btae416/7698030?utm_source=authortollfreelink&utm_campaign=bioinformatics&utm_medium=email&guestAccessKey=f4fca1d2-49ec-4b10-b476-5aea3bf37045) and the ADMET-AI live [web server](https://admet.ai.greenstonebio.com) are based on ADMET-AI v1. The main difference is that ADMET-AI v2 uses Chemprop v2 (without RDKit fingerprints), which is faster and is compatible with more packages (e.g., recent versions of PyTorch). Note that since the models were retrained from scratch, the predictions of ADMET-AI v2 will not exactly match those of ADMET-AI v1. If you still need to use ADMET-AI v1 or want to view instructions for reproducing our paper, you can see ADMET-AI v1.4.0 at [this commit](https://github.com/swansonk14/admet_ai/tree/9c8430862b2afd997ff1d314b30bda4418fa9b33).
 
 
 ## Table of Contents
@@ -52,11 +56,8 @@ pip install -e .
 ```
 
 By default, the pip installation only includes dependencies required for making ADMET predictions, either via the
-command line or via the Python API. To install dependencies required for processing TDC data or plotting TDC results,
-run `pip install admet-ai[tdc]`. To install dependencies required for hosting the ADMET-AI web server,
+command line or via the Python API. To install dependencies required for hosting the ADMET-AI web server,
 run `pip install admet-ai[web]`.
-
-Note: The PyTDC package may require Python version 3.10, in which case it is recommended to create a separate environment just for the TDC scripts and install PyTDC (and typed-argument-parser) manually in that environment.
 
 If there are version issues with the required packages, create a conda environment with specific working versions of the
 packages as follows.

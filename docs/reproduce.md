@@ -12,7 +12,7 @@ This document provides step-by-step instructions for reproducing the ADMET-AI mo
 
 ## Download TDC ADMET data
 
-For the following download command only, use a Python environment that contains `PyTDC==1.1.15` and `typed-argument-parser`. (Note that PyTDC is incompatible with the other requirements in ADMET-AI.)
+For the following download command only, use a Python environment with Python version 3.10 that contains `PyTDC==1.1.15` and `typed-argument-parser==1.11.0`. (Note that PyTDC is incompatible with the other requirements in ADMET-AI.)
 
 Download all TDC [ADME](https://tdcommons.ai/single_pred_tasks/adme/) and [Tox](https://tdcommons.ai/single_pred_tasks/tox/) datasets for training models. Skip datasets that are redundant or not needed.
 
