@@ -10,6 +10,10 @@ import pytest
 from admet_ai import admet_predict, ADMETModel
 from admet_ai.constants import DEFAULT_ADMET_PATH, DEFAULT_DRUGBANK_PATH
 
+# Tolerances for comparing PyTorch predictions across Python versions and operating systems.
+RTOL = 1e-3
+ATOL = 1e-4
+
 
 ADMET_DATA = pd.read_csv(DEFAULT_ADMET_PATH)
 DRUGBANK_DATA = pd.read_csv(DEFAULT_DRUGBANK_PATH)
@@ -48,7 +52,9 @@ class TestADMETPredict:
             assert len(preds.columns) == len(expected)
 
             for column in preds.columns:
-                assert np.allclose(preds[column].values, FIRST_DRUGBANK_ROW[column]), f"Column {column} does not match"
+                assert np.allclose(
+                    preds[column].values, FIRST_DRUGBANK_ROW[column], rtol=RTOL, atol=ATOL
+                ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -77,7 +83,7 @@ class TestADMETPredict:
 
             for column in preds.columns:
                 assert np.allclose(
-                    preds[column].values, DRUGBANK_DATA[column].values
+                    preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
                 ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
@@ -108,7 +114,7 @@ class TestADMETPredict:
 
             for column in preds.columns:
                 assert np.allclose(
-                    preds[column].values, reference_data[column].values
+                    preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL
                 ), f"Column {column} does not match"
 
 
@@ -130,7 +136,9 @@ class TestADMETModel:
         assert len(preds) == len(expected)
 
         for key in preds.keys():
-            assert np.allclose(preds[key], FIRST_DRUGBANK_ROW[key]), f"{key} prediction does not match"
+            assert np.allclose(
+                preds[key], FIRST_DRUGBANK_ROW[key], rtol=RTOL, atol=ATOL
+            ), f"{key} prediction does not match"
 
     @pytest.mark.parametrize("num_workers", [0, 1])
     @pytest.mark.parametrize("include_physchem", [True, False])
@@ -149,7 +157,9 @@ class TestADMETModel:
         assert len(preds.columns) == len(expected)
 
         for column in preds.columns:
-            assert np.allclose(preds[column].values, DRUGBANK_DATA[column].values), f"Column {column} does not match"
+            assert np.allclose(
+                preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
+            ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
     def test_admet_model_drugbank_with_percentiles(self, atc_code: str | None) -> None:
@@ -169,4 +179,6 @@ class TestADMETModel:
         assert len(preds.columns) == 2 * len(ADMET_DATA)
 
         for column in preds.columns:
-            assert np.allclose(preds[column].values, reference_data[column].values), f"Column {column} does not match"
+            assert np.allclose(
+                preds[column].values, reference_data[column].values, rtol=RTOL, atol=ATOL
+            ), f"Column {column} does not match"
