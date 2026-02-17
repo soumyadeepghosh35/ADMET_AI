@@ -167,20 +167,30 @@ class ADMETModel:
         mols, smiles = self._filter_valid_molecules(smiles=smiles)
 
         # Compute physicochemical properties
-        physchem_preds = compute_physicochemical_properties(all_smiles=smiles, mols=mols)
+        if self.include_physchem:
+            physchem_preds = compute_physicochemical_properties(all_smiles=smiles, mols=mols)
+        else:
+            physchem_preds = None
 
+        # Set up data loader
         data_loader = self._build_dataloader(mols=mols)
 
+        # Make predictions
         task_to_preds = self._make_ensemble_predictions(data_loader=data_loader)
 
         # Put preds in a DataFrame
         admet_preds = pd.DataFrame(task_to_preds, index=smiles)
 
         # Combine physicochemical and ADMET properties
-        assert physchem_preds.index.equals(admet_preds.index), "Internal Error: Indices do not match."
-        preds = pd.concat((physchem_preds, admet_preds), axis=1)
+        if physchem_preds is not None:
+            assert physchem_preds.index.equals(admet_preds.index), "Internal Error: Indices do not match."
+            preds = pd.concat((physchem_preds, admet_preds), axis=1)
+        else:
+            preds = admet_preds
 
+        # Add DrugBank percentiles
         final_predictions = self._add_drugbank_percentiles(preds=preds, smiles=smiles)
+
         # Convert to dictionary if SMILES type is string
         if smiles_type == str:
             final_predictions = final_predictions.iloc[0].to_dict()

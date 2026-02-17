@@ -17,7 +17,8 @@ DRUGBANK_DATA = pd.read_csv(DEFAULT_DRUGBANK_PATH)
 
 # TODO: move workers
 @pytest.mark.parametrize("num_workers", [0])
-def test_admet_predict_drugbank(num_workers: int) -> None:
+@pytest.mark.parametrize("include_physchem", [True, False])
+def test_admet_predict_drugbank(num_workers: int, include_physchem: bool) -> None:
     """Test predictions on DrugBank data using admet_predict."""
     with TemporaryDirectory() as temp_dir:
         data_path = Path(temp_dir) / "data.csv"
@@ -29,7 +30,7 @@ def test_admet_predict_drugbank(num_workers: int) -> None:
         admet_predict(
             data_path=data_path,
             save_path=preds_path,
-            include_physchem=True,
+            include_physchem=include_physchem,
             drugbank_path=None,
             atc_code=None,
             num_workers=num_workers,
@@ -37,7 +38,8 @@ def test_admet_predict_drugbank(num_workers: int) -> None:
 
         preds = pd.read_csv(preds_path).set_index("smiles")
 
-        assert len(preds.columns) == len(ADMET_DATA)
+        expected = ADMET_DATA if include_physchem else ADMET_DATA[ADMET_DATA["category"] != "Physicochemical"]
+        assert len(preds.columns) == len(expected)
 
         for column in preds.columns:
             assert np.allclose(preds[column].values, DRUGBANK_DATA[column].values), f"Column {column} does not match"
@@ -45,10 +47,11 @@ def test_admet_predict_drugbank(num_workers: int) -> None:
 
 # TODO: more workers
 @pytest.mark.parametrize("num_workers", [0])
-def test_admet_model_drugbank(num_workers: int) -> None:
+@pytest.mark.parametrize("include_physchem", [True, False])
+def test_admet_model_drugbank(num_workers: int, include_physchem: bool) -> None:
     """Test predictions on DrugBank data using ADMETModel."""
     model = ADMETModel(
-        include_physchem=True,
+        include_physchem=include_physchem,
         drugbank_path=None,
         atc_code=None,
         num_workers=num_workers,
@@ -56,7 +59,11 @@ def test_admet_model_drugbank(num_workers: int) -> None:
 
     preds = model.predict(smiles=DRUGBANK_DATA["smiles"].tolist())
 
-    assert len(preds.columns) == len(ADMET_DATA)
+    expected = ADMET_DATA if include_physchem else ADMET_DATA[ADMET_DATA["category"] != "Physicochemical"]
+    assert len(preds.columns) == len(expected)
 
     for column in preds.columns:
         assert np.allclose(preds[column].values, DRUGBANK_DATA[column].values), f"Column {column} does not match"
+
+
+# TODO: single SMILES and dictionary return
