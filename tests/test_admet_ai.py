@@ -23,7 +23,9 @@ FIRST_DRUGBANK_SMILES = FIRST_DRUGBANK_ROW["smiles"]
 
 TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 DRUGBANK_DATA_PERCENTILES = pd.read_csv(TEST_DATA_DIR / "drugbank_approved_percentiles.csv.bz2")
-DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS = pd.read_csv(TEST_DATA_DIR / "drugbank_approved_percentiles_antibiotics.csv.bz2")
+DRUGBANK_DATA_PERCENTILES_NERVOUS_SYSTEM = pd.read_csv(
+    TEST_DATA_DIR / "drugbank_approved_percentiles_nervous_system.csv.bz2"
+)
 
 
 class TestADMETPredict:
@@ -86,13 +88,13 @@ class TestADMETPredict:
                     preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
                 ), f"Column {column} does not match"
 
-    @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
+    @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_predict_drugbank_with_percentiles(self, atc_code: str | None) -> None:
         """Test admet_predict on DrugBank data with DrugBank percentiles."""
         if atc_code is None:
             reference_data = DRUGBANK_DATA_PERCENTILES
         else:
-            reference_data = DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS
+            reference_data = DRUGBANK_DATA_PERCENTILES_NERVOUS_SYSTEM
 
         with TemporaryDirectory() as temp_dir:
             data_path = Path(temp_dir) / "data.csv"
@@ -161,7 +163,7 @@ class TestADMETModel:
                 preds[column].values, DRUGBANK_DATA[column].values, rtol=RTOL, atol=ATOL
             ), f"Column {column} does not match"
 
-    @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
+    @pytest.mark.parametrize("atc_code", [None, "nervous system"])
     def test_admet_model_drugbank_with_percentiles(self, atc_code: str | None) -> None:
         """Test ADMETModel on DrugBank data with DrugBank percentiles."""
         model = ADMETModel(
@@ -172,7 +174,7 @@ class TestADMETModel:
         if atc_code is None:
             reference_data = DRUGBANK_DATA_PERCENTILES
         else:
-            reference_data = DRUGBANK_DATA_PERCENTILES_ANTIBIOTICS
+            reference_data = DRUGBANK_DATA_PERCENTILES_NERVOUS_SYSTEM
 
         preds = model.predict(smiles=reference_data["smiles"].tolist())
 
