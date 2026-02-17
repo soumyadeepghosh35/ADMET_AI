@@ -81,7 +81,7 @@ class TestADMETPredict:
                 ), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
-    def test_admet_predict_drugbank_with_reference(self, atc_code: str | None) -> None:
+    def test_admet_predict_drugbank_with_percentiles(self, atc_code: str | None) -> None:
         """Test admet_predict on DrugBank data with DrugBank percentiles."""
         if atc_code is None:
             reference_data = DRUGBANK_DATA_PERCENTILES
@@ -152,7 +152,7 @@ class TestADMETModel:
             assert np.allclose(preds[column].values, DRUGBANK_DATA[column].values), f"Column {column} does not match"
 
     @pytest.mark.parametrize("atc_code", [None, "antibiotics"])
-    def test_admet_model_drugbank_with_reference(self, atc_code: str | None) -> None:
+    def test_admet_model_drugbank_with_percentiles(self, atc_code: str | None) -> None:
         """Test ADMETModel on DrugBank data with DrugBank percentiles."""
         model = ADMETModel(
             include_physchem=True,

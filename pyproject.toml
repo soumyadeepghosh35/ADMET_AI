@@ -32,11 +32,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "chemprop==2.2.2",
+    "chemprop>=2.2.2",
     "lightning",
     "numpy",
     "pandas",
-    "rdkit",
+    "rdkit>=2025.9.5",
     "seaborn",
     "torch>=2.8.0",
     "tqdm>=4.66.3",
@@ -44,6 +44,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+tdc = ["openpyxl", "PyTDC==1.1.15"]
 web = ["flask", "gunicorn>=22.0.0"]
 
 [project.urls]

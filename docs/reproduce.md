@@ -81,7 +81,7 @@ Make ADMET predictions on DrugBank approved drugs using Chemprop multitask predi
 ```bash
 admet_predict \
     --data_path data/drugbank/drugbank_approved.csv \
-    --save_path data/drugbank/drugbank_approved_physchem_admet.csv \
+    --save_path admet_ai/resources/data/drugbank_approved.csv \
     --models_dir models/tdc_admet_all_multitask/chemprop \
     --smiles_column smiles \
     --drugbank_path None
