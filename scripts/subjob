@@ -1,0 +1,2 @@
+python runToxicity.py config.yaml > toxicity.out
+
